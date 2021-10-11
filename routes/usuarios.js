@@ -1,40 +1,21 @@
 // @ts-check
 const { Router } = require('express');
 const router = Router();
+const ctrlUsuario = require('../controllers/usuarios');
 
 // Obtener todos los usuarios
-router.get('/', (req, res) => { 
-    res.json({
-        msg: 'get usuarios'
-    });
-});
+router.get('/', ctrlUsuario.obtenerUsuarios);
 
 // Obtener un usuario por id
-router.get('/:id', (req, res) => {
-    res.json({
-        msg: 'get usuario ' + req.params.id
-    });
-});
+router.get('/:id', ctrlUsuario.obtenerUsuario);
 
 // Crear un usuario
-router.post('/', (req, res) => {
-    res.json({
-        msg: 'post usuario'
-    });
-});
+router.post('/', ctrlUsuario.crearUsuario);
 
 // Actualizar un usuario
-router.put('/:id', (req, res) => {
-    res.json({
-        msg: 'put usuario ' + req.params.id
-    });
-});
+router.put('/:id', ctrlUsuario.actualizarUsario);
 
 // Eliminar un usuario
-router.delete('/:id', (req, res) => {
-    res.json({
-        msg: 'delete usuario ' + req.params.id
-    });
-});
+router.delete('/:id', ctrlUsuario.eliminarUsusario);
 
 module.exports = router;
