@@ -55,7 +55,7 @@ const actualizarUsario = async (req, res = response) => {
     });
 };
 
-const eliminarUsusario = async (req, res = response) => {
+const eliminarUsuario = async (req, res = response) => {
     let id = req.params.id;
 
     const usuarioActualizado = await Usuario.findByIdAndUpdate(id, {
@@ -72,5 +72,5 @@ module.exports = {
     obtenerUsuario,
     crearUsuario,
     actualizarUsario,
-    eliminarUsusario
+    eliminarUsuario
 };
