@@ -1,5 +1,6 @@
 // @ts-check
 const { response } = require("express");
+const bcrypt = require('bcryptjs');
 const Usuario = require("../models/usuario");
 const { generateUsername } = require("../helpers/functions");
 
@@ -27,6 +28,8 @@ const crearUsuario = async (req, res = response) => {
     let { nombre, correo, password } = req.body;
 
     let username = generateUsername(nombre);
+    let salt = bcrypt.genSaltSync();
+    password = bcrypt.hashSync(password, salt);
 
     const usuario = new Usuario({
         nombre,
