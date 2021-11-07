@@ -1,5 +1,7 @@
+//@ts-check
 const bcrypt = require('bcryptjs');
 const Usuario = require("../models/usuario");
+const { generarJWT } = require('../helpers/jwt');
 
 const login = async (req, res) => {
     const { correo, password } = req.body;
@@ -19,8 +21,11 @@ const login = async (req, res) => {
         });
     }
 
+    let token = await generarJWT(usuario.id);
+
     res.status(200).json({
-        usuario
+        usuario,
+        token
     });
 }
 
