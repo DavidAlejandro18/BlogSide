@@ -51,6 +51,25 @@ const actualizarUsario = async (req, res = response) => {
     // Y AL FINAL DEJAMOS SOLO LOS QUE QUEREMOS QUE SE ACTUALICEN (...datos)
     const { _id, username, role, estado, google, createdAt, updatedAt, __v, ...datos } = req.body;
 
+    // SI SE VA A ACTUALIZAR LA CONTRASEÑA, SE ENCRIPTARA
+    if(datos.password) {
+        let salt = bcrypt.genSaltSync();
+        datos.password = bcrypt.hashSync(datos.password, salt);
+    }
+
+    // SI SE VA A ACTUALIZAR EL CORREO, REVISAMOS QUE NO ESTE REGISTRADO OTRO USUARIO CON EL MISMO CORREO
+    // SI EL USUARIO MANDA EL MISMO CORREO QUE EL QUE TIENE REGISTRADO, NO SE ACTUALIZARA
+
+    if(datos.correo) {
+        if(datos.correo != req.usuario.correo) {
+            const existeCorreo = await Usuario.findOne({ correo: datos.correo });
+    
+            if(existeCorreo) {
+                throw new Error(`El correo '${datos.correo}' ya esta registrado. Intenta iniciar sesión.`);
+            }
+        }
+    }
+
     const usuarioActualizado = await Usuario.findByIdAndUpdate(id, datos);
 
     res.json({
