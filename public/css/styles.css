@@ -1,0 +1,13 @@
+.mt-6 {
+    margin-top: 4.5rem !important;
+}
+
+.vh-75 {
+    height: 75vh;
+}
+
+.btn-google {
+    color: #545454;
+    background-color: #ffffff;
+    box-shadow: 0 1px 2px 1px #ddd
+}
