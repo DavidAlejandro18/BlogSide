@@ -1,0 +1,114 @@
+{{> header }}
+
+{{> headerFrontend }}
+
+<div class="container-fluid mt-6 p-0">
+    <div class="custom-vh-100 w-100 d-flex d-flex-rows justify-content-center align-items-center">
+        <div class="login text-center">
+            <div class="form-signin">
+                <form class="needs-validation" id = "formLogin" novalidate>
+                    {{!-- <img class="mb-4" src="https://getbootstrap.com/docs/5.0/assets/brand/bootstrap-logo.svg" alt="" width="72" height="57"> --}}
+                    <img class="mb-3" src="/img/BlogSide.svg" alt="BlogSide Logo" height="100">
+                    <h1 class="h3 mb-3 fw-normal">Welcome to BlogSide</h1>
+
+                    <div class="form-floating">
+                        <input type="email" class="form-control" id="floatingInput" name="correo" placeholder="Email address" required>
+                        <label for="floatingInput">Email address</label>
+                    </div>
+                    {{!-- <div class="form-floating">
+                        <input type="password" class="form-control" id="floatingPassword" name="password" placeholder="Password">
+                        <label for="floatingPassword">Password</label>
+                    </div> --}}
+
+                    <div class="input-group mb-2">
+                        <div class="form-floating flex-grow-1">
+                            <input type="password" class="form-control" name="password" id="password" placeholder="Password" style = "border-bottom-right-radius: 0;" required>
+                            <label for="code1">Password</label>
+                        </div>
+                        <span class="input-group-text" role="button" tabindex="0" id="viewPassBtn">
+                            <i class="bi bi-eye-fill" style="font-size: 20px;"></i>
+                        </span>
+
+                    </div>
+
+                    {{!-- <div class="input-group mb-3">
+                        <input type="text" class="form-control" placeholder="Recipient's username" aria-label="Recipient's username" aria-describedby="basic-addon2">
+                        <span class="input-group-text" id="basic-addon2">@example.com</span>
+                    </div> --}}
+
+                    {{!-- <div class="form-check mb-3">
+                        <label class="form-check-label" for="flexCheckDefault">
+                            <input class="form-check-input" type="checkbox" value="remember-me" id="flexCheckDefault"> Remember me
+                        </label>
+                    </div> --}}
+                    <button class="w-100 btn btn-lg btn-primary" type="submit">Log in</button>
+                </form>
+                <div class="card border-danger mb-3 mt-2 d-none" id = "alertaLogin">
+                    <div class="card-body text-danger">
+                        <p class="card-text">Contraseña o correo incorrectos</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let formLogin = document.getElementById('formLogin');
+
+    formLogin.addEventListener('submit', function(e){
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (formLogin.checkValidity()) {
+            let data = JSON.stringify({
+                correo: formLogin.correo.value,
+                password: formLogin.password.value
+            });
+
+            var config = {
+                method: 'post',
+                url: './api/auth/login',
+                data,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                withCredentials: true
+            };
+
+            axios(config)
+                .then(function (response) {
+                    alertaLogin.classList.add('d-none');
+                    let { token, usuario } = response.data;
+                    localStorage.setItem('token', token);
+                    localStorage.setItem('usuario', JSON.stringify(usuario));
+                    
+                    window.location.href = 'http://localhost:4000/';
+                })
+                .catch(function (error) {
+                    alertaLogin.classList.remove('d-none');
+                });
+        }
+
+        formLogin.classList.add('was-validated')
+    });
+
+    let viewPassBtn = document.getElementById('viewPassBtn');
+
+    viewPassBtn.addEventListener('click', function(){
+        let password = document.getElementById('password');
+        let icon = document.querySelector('.bi');
+
+        if (password.type === 'password') {
+            password.type = 'text';
+            icon.classList.remove('bi-eye-fill');
+            icon.classList.add('bi-eye-slash-fill');
+        } else {
+            password.type = 'password';
+            icon.classList.remove('bi-eye-slash-fill');
+            icon.classList.add('bi-eye-fill');
+        }
+    });
+</script>
+
+{{> footer }}

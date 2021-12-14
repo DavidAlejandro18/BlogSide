@@ -2,27 +2,38 @@
     <div class="container">
         <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start ">
             <a href="/" class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
-                <span style="font-size: 2em;">
+                {{!-- <span style="font-size: 2em;">
                     <i class="fas fa-dharmachakra"></i>
-                </span>
+                </span> --}}
+                <img class="my-2" src="/img/BlogSide.svg" alt="BlogSide Logo" height="32">
             </a>
 
-            <!-- <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
-                    <li><a href="#" class="nav-link px-2 text-white">Home</a></li>
-                    <li><a href="#" class="nav-link px-2 text-white">Features</a></li>
-                    <li><a href="#" class="nav-link px-2 text-white">Pricing</a></li>
-                    <li><a href="#" class="nav-link px-2 text-white">FAQs</a></li>
-                    <li><a href="#" class="nav-link px-2 text-white">About</a></li>
-                </ul> -->
+            <ul class="nav col-12 col-lg-auto mb-2 justify-content-center mb-md-0">
+                <li><a href="/" class="nav-link px-2 text-white">BlogSide</a></li>
+                <li><a class="nav-link px-2 text-white">|</a></li>
+                <li><a href="/" class="nav-link px-2 text-white">Home</a></li>
+                <li><a href="/" class="nav-link px-2 text-white">About</a></li>
+                {{#if usuario}}
+                    <li><a href="/dashboard" class="nav-link px-2 text-white">Dashboard</a></li>
+                    <li><a href="/settings" class="nav-link px-2 text-white">Settings</a></li>
+                    {{#ifEquals usuario.role 'SUPREME_ADMIN_ROLE'}}
+                        <li><a class="nav-link px-2 text-white">|</a></li>
+                        <li><a href="/usuarios-lista" class="nav-link px-2 text-white">Usuarios</a></li>
+                    {{/ifEquals}}
+                {{/if}}
+            </ul>
 
-            <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-auto ms-2 input-group-sm">
+            {{!-- <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-auto ms-2 input-group-sm">
                 <input type="search" class="form-control form-control-dark" aria-label="Search">
-            </form>
+            </form> --}}
 
-            <div class="text-end">
-                <button type="button" class="btn btn-sm btn-outline-light me-2" data-bs-toggle="modal"
-                    data-bs-target="#modalLogin">Login</button>
-                <button type="button" class="btn btn-sm btn-warning">Sign-up</button>
+            <div class="text-end ms-lg-auto">
+                {{#if usuario}}
+                    <a href = "/logout" class="btn btn-sm btn-outline-light me-2">Logout</a>
+                {{else}}
+                    <a href = "/login" class="btn btn-sm btn-outline-light me-2">Login</a>
+                    {{!-- <button type="button" class="btn btn-sm btn-warning">Sign-up</button> --}}
+                {{/if}}
             </div>
         </div>
     </div>
