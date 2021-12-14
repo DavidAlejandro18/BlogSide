@@ -3,6 +3,7 @@ const express = require('express');
 const hbs = require('hbs');
 const path = require('path');
 const cors = require('cors');
+const session = require('express-session');
 const dbConnection = require('../database/config');
 
 class Server {
@@ -14,6 +15,7 @@ class Server {
             usuarios: '/api/usuarios',
             auth: '/api/auth'
         };
+        this.secret_session = process.env.SECRET_SESSION;
 
         this.conectarDB();
 
@@ -29,6 +31,20 @@ class Server {
     }
 
     middlewares() {
+        this.app.use(session({
+            secret: this.secret_session,
+            resave: false,
+            name: 'user',
+            proxy: true,
+            saveUninitialized: true,
+            cookie: {
+                secure: false, 
+                path: '/',
+                maxAge: 4 * 60 * 60 * 1000,
+                httpOnly: true
+            }
+        }));
+        
         this.app.use(cors());
 
         this.app.use(express.json());
@@ -39,12 +55,15 @@ class Server {
     handlebars() {
         this.app.set("view engine", "hbs");
         hbs.registerPartials(path.join(__dirname, "../", "/views/partials"));
+        hbs.registerHelper('ifEquals', function(arg1, arg2, options) {
+            return (arg1 == arg2) ? options.fn(this) : options.inverse(this);
+        });
     }
 
     routes() {
-        this.app.use(require('../routes/pages'));
         this.app.use(this.paths.usuarios, require('../routes/usuarios'));
         this.app.use(this.paths.auth, require('../routes/auth'));
+        this.app.use(require('../routes/pages'));
     }
 
     listen() {

@@ -1,33 +1,29 @@
 // @ts-check
 const { Router } = require('express');
 const router = Router();
+const { validarLogin, validarPaginasUsuario, validarPaginaSuperUsuario } = require('../middlewares');
+const controllerPages = require('../controllers/pages');
 
-router.get('/', (req, res) => {
-    //res.send('Menú principal');
-    res.render("index", {
-        title: "BlogSide",
-    });
-});
+router.get('/', controllerPages.ctrlIndex);
 
-router.get('/dashboard', (req, res) => {
-    //res.send('Dashboard');
-    res.render("dashboard", {
-        title: "Dashboard",
-        headerFrontendStatus: true
-    });
-});
+router.get('/login', [
+    validarLogin
+], controllerPages.ctrlLogin);
 
-router.get("/settings", (req, res) => {
-    res.send("Settings");
-});
+router.get('/logout', controllerPages.ctrlLogout);
 
-router.get("/@:username?", (req, res) => {
-    res.send('Usuario: '+ req.params.username);
-});
+router.get('/dashboard', [
+    validarPaginasUsuario
+], controllerPages.ctrlDashboard);
 
-router.get("/signout", (req, res) => {
-    res.send('Cerramos sesión');
-});
+router.get("/settings", [
+    validarPaginasUsuario
+], controllerPages.ctrlSettings);
 
+router.get("/@:username?", controllerPages.ctrlUsername);
+
+router.get('/usuarios-lista', [
+    validarPaginaSuperUsuario
+], controllerPages.ctrlUsuariosLista);
 
 module.exports = router;
