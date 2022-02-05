@@ -6,6 +6,8 @@ const controllerPages = require('../controllers/pages');
 
 router.get('/', controllerPages.ctrlIndex);
 
+router.get('/about', controllerPages.ctrlAbout);
+
 router.get('/login', [
     validarLogin
 ], controllerPages.ctrlLogin);

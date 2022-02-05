@@ -7,6 +7,10 @@ const ctrlIndex = (req, res) => {
     });
 }
 
+const ctrlAbout = (req, res) => {
+    res.send('About');
+}
+
 const ctrlLogin = (req, res) => {
     res.render("login", {
         title: "BlogSide | Login",
@@ -22,7 +26,8 @@ const ctrlDashboard = (req, res) => {
     res.render("dashboard", {
         title: "BlogSide | Dashboard",
         headerFrontendStatus: true,
-        usuario: global.usuario
+        usuario: req.session.usuario,
+        token: req.session.token
     });
 }
 
@@ -40,6 +45,7 @@ const ctrlUsuariosLista = (req, res) => {
 
 module.exports = {
     ctrlIndex,
+    ctrlAbout,
     ctrlLogin,
     ctrlLogout,
     ctrlDashboard,

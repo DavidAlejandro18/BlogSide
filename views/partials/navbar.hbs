@@ -1,0 +1,43 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-dark">
+    <div class="container d-flex mx-auto">
+        <a class="navbar-brand d-flex align-items-center" href="/">
+            <img src="/img/BlogSide.svg" alt="BlogSide Logo" height="32">
+        </a>
+
+        <button class="navbar-toggler ms-auto" type="button" data-bs-toggle="offcanvas" data-bs-target="#menuMobile">
+            <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" fill="#fff" class="bi bi-list"
+                viewBox="0 0 16 16">
+                <path fill-rule="evenodd"
+                    d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z" />
+            </svg>
+        </button>
+
+        <div class="collapse navbar-collapse justify-content-end">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link active text-white" href="/">Inicio</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active text-white" href="/about">Acerca de mí</a>
+                </li>
+                {{#if usuario}}
+                <li class="nav-item">
+                    <a class="nav-link active text-white" href="/dashboard">Dashboard</a>
+                </li>
+                {{/if}}
+            </ul>
+
+            {{!-- <div class="ms-auto text-white">Hola</div> --}}
+        </div>
+    </div>
+</nav>
+
+<div class="offcanvas offcanvas-end" tabindex="-1" id="menuMobile">
+    <div class="offcanvas-header">
+        <h5 id="offcanvasRightLabel">Menú</h5>
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        Aquí va a estar la lista
+    </div>
+</div>
