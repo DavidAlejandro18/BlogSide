@@ -17,10 +17,6 @@
                                 <input type="email" class="form-control" id="floatingInput" name="correo" placeholder="Email address" required>
                                 <label for="floatingInput">Email address</label>
                             </div>
-                            {{!-- <div class="form-floating">
-                                <input type="password" class="form-control" id="floatingPassword" name="password" placeholder="Password">
-                                <label for="floatingPassword">Password</label>
-                            </div> --}}
 
                             <div class="input-group mb-2">
                                 <div class="form-floating flex-grow-1">
@@ -33,21 +29,11 @@
 
                             </div>
 
-                            {{!-- <div class="input-group mb-3">
-                                <input type="text" class="form-control" placeholder="Recipient's username" aria-label="Recipient's username" aria-describedby="basic-addon2">
-                                <span class="input-group-text" id="basic-addon2">@example.com</span>
-                            </div> --}}
-
-                            {{!-- <div class="form-check mb-3">
-                                <label class="form-check-label" for="flexCheckDefault">
-                                    <input class="form-check-input" type="checkbox" value="remember-me" id="flexCheckDefault"> Remember me
-                                </label>
-                            </div> --}}
                             <button class="w-100 btn btn-lg btn-primary" type="submit">Log in</button>
                         </form>
                         <div class="card border-danger mb-3 mt-2 d-none" id = "alertaLogin">
                             <div class="card-body text-danger">
-                                <p class="card-text">Contraseña o correo incorrectos</p>
+                                <p class="card-text">¿Qué intentas hacer?</p>
                             </div>
                         </div>
                     </div>
@@ -97,9 +83,9 @@
 
             let viewPassBtn = document.getElementById('viewPassBtn');
 
-            viewPassBtn.addEventListener('click', function(){
+            viewPassBtn.addEventListener('click', function() {
                 let password = document.getElementById('password');
-                let icon = document.querySelector('.bi');
+                let icon = this.querySelector('.bi');
 
                 if (password.type === 'password') {
                     password.type = 'text';
