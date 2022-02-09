@@ -1,14 +1,16 @@
 //@ts-check
 const ctrlIndex = (req, res) => {
     res.render("index", {
-        title: "BlogSide | Welcome",
+        title: "BlogSide",
         usuario: req.session.usuario,
         token: req.session.token
     });
 }
 
 const ctrlAbout = (req, res) => {
-    res.send('About');
+    res.render('about', {
+        title: 'BlogSide | Acerca de mí',
+    });
 }
 
 const ctrlLogin = (req, res) => {
