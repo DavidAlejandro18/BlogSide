@@ -61,6 +61,15 @@
     width: 90%;
 }
 
+.social-link {
+    text-decoration: none;
+    color: black;
+}
+
+.social-link:hover {
+    color: #0a66c2;
+}
+
 @media (min-width: 1400px) {
     .container, .container-lg, .container-md, .container-sm, .container-xl, .container-xxl {
         max-width: 70rem;
