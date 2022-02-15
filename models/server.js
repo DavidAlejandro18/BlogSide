@@ -1,5 +1,6 @@
 // @ts-check
 const express = require('express');
+const fileUpload = require('express-fileupload');
 const hbs = require('hbs');
 const path = require('path');
 const cors = require('cors');
@@ -13,7 +14,8 @@ class Server {
         this.port = process.env.PORT || 3000;
         this.paths = {
             usuarios: '/api/usuarios',
-            auth: '/api/auth'
+            auth: '/api/auth',
+            blog: "/blog"
         };
         this.secret_session = process.env.SECRET_SESSION;
 
@@ -50,6 +52,12 @@ class Server {
         this.app.use(express.json());
 
         this.app.use(express.static('public'));
+
+        this.app.use(fileUpload({
+            useTempFiles : true,
+            tempFileDir : '/tmp/',
+            createParentPath: true
+        }));
     }
 
     handlebars() {
@@ -63,6 +71,7 @@ class Server {
     routes() {
         this.app.use(this.paths.usuarios, require('../routes/usuarios'));
         this.app.use(this.paths.auth, require('../routes/auth'));
+        this.app.use(this.paths.blog, require('../routes/blog'));
         this.app.use(require('../routes/pages'));
     }
 
