@@ -27,7 +27,14 @@ const ctrlLogout = (req, res) => {
 const ctrlDashboard = (req, res) => {
     res.render("dashboard", {
         title: "BlogSide | Dashboard",
-        headerFrontendStatus: true,
+        usuario: req.session.usuario,
+        token: req.session.token
+    });
+}
+
+const ctrlCreatePost = (req, res) => {
+    res.render('createPost', {
+        title: 'BlogSide | Crear nuevo post',
         usuario: req.session.usuario,
         token: req.session.token
     });
@@ -45,12 +52,14 @@ const ctrlUsuariosLista = (req, res) => {
     res.send('Lista de usuarios a los que podemos eliminar o modificar');
 }
 
+
 module.exports = {
     ctrlIndex,
     ctrlAbout,
     ctrlLogin,
     ctrlLogout,
     ctrlDashboard,
+    ctrlCreatePost,
     ctrlSettings,
     ctrlUsername,
     ctrlUsuariosLista

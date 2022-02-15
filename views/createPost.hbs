@@ -1,0 +1,52 @@
+{{> topPage }}
+
+<div class="vh-100 d-flex flex-column">
+    {{> navbar }}
+
+    <div class="main">
+        <div class="container p-3">
+            <h3>Crear nuevo post</h3>
+
+            <div class="row">
+                <div class="col-md-10">
+                    <form id = "formPublicar">
+                        <div class="mb-3">
+                            <label for="banerPost" class="form-label">Baner</label>
+                            <input class="form-control" id="banerPost" type="file" accept="image/*" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="tituloPost" class="form-label">Titulo</label>
+                            <input type="text" class="form-control" id="tituloPost" placeholder="Ej: ¿Cómo usar Postman?" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="contenidoPost" class="form-label">Contenido</label>
+                            <textarea id = "contenidoPost">
+                                ¿De qué vas a escribir hoy?
+                            </textarea>
+                        </div>
+
+                        <input class="btn btn-success" type="submit" value="Publicar">
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    tinymce.init({
+        selector: 'textarea',
+        plugins: 'advlist autolink lists link image charmap print preview hr anchor pagebreak',
+        toolbar_mode: 'floating',
+        height: '400'
+    });
+
+    $("#formPublicar").on("submit", function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        console.log("Aquí vamos a enviar la información");        
+    });
+</script>
+
+{{> bottomPage }}

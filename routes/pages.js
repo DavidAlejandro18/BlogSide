@@ -18,6 +18,10 @@ router.get('/dashboard', [
     validarPaginasUsuario
 ], controllerPages.ctrlDashboard);
 
+router.get('/create-post', [
+    validarPaginasUsuario
+], controllerPages.ctrlCreatePost);
+
 router.get("/settings", [
     validarPaginasUsuario
 ], controllerPages.ctrlSettings);
