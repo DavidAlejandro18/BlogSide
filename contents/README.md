@@ -1,0 +1,1 @@
+## Aquí se van a almacenar el contenido de los blogs en archivos HTML

@@ -1,5 +1,10 @@
 //@ts-check
 const { v4: uuidv4 } = require('uuid');
+const path = require('path');
+const fs = require('fs');
+const cloudinary = require('cloudinary').v2;
+cloudinary.config(process.env.CLOUDINARY_URL);
+
 const Post = require('../models/post');
 
 const getPosts = (req, res) => {
@@ -28,24 +33,35 @@ const createPost = async (req, res) => {
     const nombreCortado = baner.name.split('.');
     const extension = nombreCortado[nombreCortado.length - 1];
 
-    const newNameImage = `${uuidv4()}.${extension}`;
+    if(!archivosPermitidos.includes(extension)) {
+        return res.status(400).json({
+            msg: 'Extension no permitida'
+        });
+    }
+
+    // SUBIMOS LA IMAGEN A CLOUDINARY
+    const { tempFilePath } = baner;
+    const { secure_url } = await cloudinary.uploader.upload(tempFilePath, { folder: 'baners' });
+
+    // GUARDAMOS EL CONTENIDO DEL POST EN EL SERVIDOR
+    const pathContent = path.join(__dirname, `../contents/${url}.html`);
+    await fs.writeFile(pathContent, content, (err) => {
+        if(err) {
+            return res.status(500).json({
+                msg: 'Error al guardar el contenido del post'
+            });
+        }
+    });
 
     const newPost = new Post({
         titulo,
         url,
-        content,
-        baner: newNameImage,
+        content: `${url}.html`,
+        baner: secure_url,
         creadoPor: req.usuario._id
     });
 
     await newPost.save();
-
-    // TO-DO
-    // falta mover la imagen al path correcto
-    // y guardar el contenido en un archivo txt
-    // generar el nombre y cuando termine de guardar
-    // mover el archivo a la carpeta correcta
-    // y guardar unicamente el nombre del archivo en la BD
 
     res.json(newPost);
 }
