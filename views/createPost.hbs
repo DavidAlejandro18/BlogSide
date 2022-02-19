@@ -25,7 +25,7 @@
                             </textarea>
                         </div>
 
-                        <input class="btn btn-success" type="submit" value="Publicar">
+                        <button class="btn btn-success" type="submit">Generar post</button>
                     </form>
                 </div>
             </div>
@@ -33,19 +33,108 @@
     </div>
 </div>
 
+{{!-- Notificación fallida --}}
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+    <div id="notifyFail" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="rgb(236, 29, 51)"
+                class="bi bi-bell-fill me-2" viewBox="0 0 16 16">
+                <path
+                    d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zm.995-14.901a1 1 0 1 0-1.99 0A5.002 5.002 0 0 0 3 6c0 1.098-.5 6-2 7h14c-1.5-1-2-5.902-2-7 0-2.42-1.72-4.44-4.005-4.901z" />
+            </svg>
+            <strong class="me-auto">Error</strong>
+            <small>Ahora</small>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+            Algo salio mal: <span class="fst-italic" id="msgError">Error indefinido</span>
+        </div>
+    </div>
+</div>
+
 <script>
     tinymce.init({
         selector: 'textarea',
-        plugins: 'advlist autolink lists link image charmap print preview hr anchor pagebreak',
-        toolbar_mode: 'floating',
-        height: '400'
+        height: 700,
+        plugins: 'image lists imagetools media table link',
+        toolbar: 'undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | forecolor backcolor | bullist numlist outdent indent | image media link | table tabledelete | tableprops tablerowprops tablecellprops | tableinsertrowbefore tableinsertrowafter tabledeleterow | tableinsertcolbefore tableinsertcolafter tabledeletecol',
+        entity_encoding : "raw",
+        image_title: true,
+        automatic_uploads: true,
+        file_picker_types: 'image',
+        file_picker_callback: function (cb, value, meta) {
+            var input = document.createElement('input');
+            input.setAttribute('type', 'file');
+            input.setAttribute('accept', 'image/*');
+
+            input.onchange = function () {
+                var file = this.files[0];
+
+                var reader = new FileReader();
+                reader.onload = function () {
+                    var id = 'blobid' + (new Date()).getTime();
+                    var blobCache = tinymce.activeEditor.editorUpload.blobCache;
+                    var base64 = reader.result.split(',')[1];
+                    var blobInfo = blobCache.create(id, file, base64);
+                    blobCache.add(blobInfo);
+
+                    console.log(blobInfo.blobUri());
+
+                    /* call the callback and populate the Title field with the file name */
+                    cb(blobInfo.blobUri(), { title: file.name });
+                };
+
+                reader.readAsDataURL(file);
+                //reader.readAsBinaryString(file);
+            };
+
+            input.click();
+        }
     });
 
-    $("#formPublicar").on("submit", function(e) {
+    $("#formPublicar").on("submit", function (e) {
         e.preventDefault();
         e.stopPropagation();
 
-        console.log("Aquí vamos a enviar la información");        
+        if (this.checkValidity()) {
+            let data = new FormData();
+            data.append('titulo', $('#tituloPost').val());
+            data.append('baner', $('#banerPost')[0].files[0]);
+            data.append('content', tinymce.activeEditor.getContent());
+
+            let config = {
+                method: 'POST',
+                url: './blog/create-post',
+                data,
+                headers: {
+                    "x-token": `{{ token }}`
+                }
+            };
+
+            $(`#${this.id} button[type='submit']`).prop('disabled', true);
+            $(`#${this.id} button[type='submit']`).html(`
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                Generando post...
+            `);
+
+            axios(config)
+                .then(function (response) {
+
+                    if (response.status == 200) {
+                        $(`#${this.id} button[type='submit']`).prop('disabled', false);
+                        $(`#${this.id} button[type='submit']`).val(`Publicar`);
+                        window.open(`./blog/${response.data.url}`);
+                        window.location.href = `./dashboard`;
+                    }
+
+                })
+                .catch(function (error) {
+                    const notificationAudio = new Audio("./audio/notification.wav")
+                    notificationAudio.play();
+                    $('#notifyFail').toast('show');
+                    $('#msgError').text(error.response.data.msg);
+                });
+        }
     });
 </script>
 

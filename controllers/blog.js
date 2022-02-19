@@ -20,11 +20,12 @@ const createPost = async (req, res) => {
     let archivosPermitidos = ['png', 'jpg', 'jpeg', 'gif'];
 
     // OBTENEMOS EL TITULO Y EL CONTENIDO
-    const { titulo, content } = req.body;
+    let { titulo, content } = req.body;
 
     // GENERAMOS EL URL PERSONALIZADO
     let url = titulo.split(' ').join('-').toLowerCase();
-    url = url.replace(/[^a-z0-9-]/g, '');
+    url = url.normalize('NFD').replace(/[\u0300-\u036f]/g, ""); // SUSTITUIMOS LOS ACENTOS CON LETRAS NORMALES
+    url = url.replace(/[^a-z0-9-]/g, ''); // ELIMINAMOS LOS CARACTERES ESPECIALES
 
     // OBTENEMOS LA IMAGEN DEL BANER
     const baner = req.files.baner;
@@ -39,9 +40,22 @@ const createPost = async (req, res) => {
         });
     }
 
-    // SUBIMOS LA IMAGEN A CLOUDINARY
+    // SUBIMOS LA IMAGEN DEL BANER A CLOUDINARY
     const { tempFilePath } = baner;
     const { secure_url } = await cloudinary.uploader.upload(tempFilePath, { folder: 'baners' });
+
+    // GUARDAMOS LAS IMAGENES DEL CONTENIDO EN CLOUDINARY
+    const imgs = content.match(/<img[^>]+>/g);
+
+    await Promise.all(imgs.map(async (img) => {
+        let base64 = img.match(/src="[^"]+"/g)[0].replace(/src="|"/g, '');
+
+        if (base64.substr(0, 4) != 'http') {
+            const { secure_url: secure_url_image_post } = await cloudinary.uploader.upload(base64, { folder: 'posts' });
+
+            content = content.replace(`src="${base64}"`, `src="${secure_url_image_post}"`);
+        }
+    }));
 
     // GUARDAMOS EL CONTENIDO DEL POST EN EL SERVIDOR
     const pathContent = path.join(__dirname, `../contents/${url}.html`);
