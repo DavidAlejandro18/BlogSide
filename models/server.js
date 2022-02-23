@@ -63,8 +63,45 @@ class Server {
     handlebars() {
         this.app.set("view engine", "hbs");
         hbs.registerPartials(path.join(__dirname, "../", "/views/partials"));
-        hbs.registerHelper('ifEquals', function(arg1, arg2, options) {
-            return (arg1 == arg2) ? options.fn(this) : options.inverse(this);
+        
+        // @ts-ignore
+        hbs.registerHelper({
+            ifEquals: function(arg1, arg2, options) {
+                return (arg1 == arg2) ? options.fn(this) : options.inverse(this);
+            },
+            switch: function(value, options) {
+                this.switch_value = value;
+                this.switch_break = false;
+                return options.fn(this);
+            },
+            case: function(value, options) {
+                // @ts-ignore
+                if (value == this.switch_value) {
+                    this.switch_break = true;
+                    return options.fn(this);
+                }
+            },
+            default: function(value, options) {
+                // @ts-ignore
+                if (this.switch_break == false) {
+                    return value;
+                }
+            },
+            prettyDate: function(value, options) {
+                let date = new Date(value);
+
+                let day = date.getDate();
+                let month = date.getMonth() + 1;
+                let year = date.getFullYear();
+
+                let hours = date.getHours(); 
+                let minutes = date.getMinutes();
+
+                let date_format = `${day}/${month}/${year}`;
+                let time_format = `${hours}:${minutes}`;
+
+                return `${date_format} a las ${time_format} horas`;
+            }
         });
     }
 

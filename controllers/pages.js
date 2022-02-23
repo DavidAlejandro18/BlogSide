@@ -1,4 +1,6 @@
 //@ts-check
+const Post = require('../models/post');
+
 const ctrlIndex = (req, res) => {
     res.render("index", {
         title: "BlogSide",
@@ -24,11 +26,20 @@ const ctrlLogout = (req, res) => {
     res.redirect('/');
 }
 
-const ctrlDashboard = (req, res) => {
+const ctrlDashboard = async (req, res) => {
+    const allPost = await Post.find({}).select("-_id").populate('creadoPor', 'username -_id');
+    const postDeleted = allPost.filter(post => post.estado === "0");
+    const postReview = allPost.filter(post => post.estado === "1");
+    const postAccepted = allPost.filter(post => post.estado === "2");
+    
     res.render("dashboard", {
         title: "BlogSide | Dashboard",
         usuario: req.session.usuario,
-        token: req.session.token
+        token: req.session.token,
+        allPost,
+        postDeleted,
+        postReview,
+        postAccepted
     });
 }
 

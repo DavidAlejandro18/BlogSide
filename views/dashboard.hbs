@@ -11,6 +11,10 @@
                         role="tab">Todos los post</button>
                 </li>
                 <li class="nav-item" role="presentation">
+                    <button class="nav-link" data-bs-toggle="pill" data-bs-target="#posts-aprobados" type="button"
+                        role="tab">Post en Aprobados</button>
+                </li>
+                <li class="nav-item" role="presentation">
                     <button class="nav-link" data-bs-toggle="pill" data-bs-target="#posts-revision" type="button"
                         role="tab">Post en revisión</button>
                 </li>
@@ -22,40 +26,115 @@
             <div class="tab-content">
                 <div class="tab-pane fade show active" id="posts" role="tabpanel" aria-labelledby="pills-home-tab">
                     
-                    <a class="btn btn-outline-primary mb-3" href="./create-post">Crear nuevo post</a>
-                    
-                    <div class="row m-0">
-                        <div class="card mb-3 col-md-9">
-                            <div class="card-body">
-                                This is some text within a card body.
-                            </div>
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div>
+                            <a class="btn btn-outline-primary" href="./create-post">Crear nuevo post</a>
                         </div>
-                        <div class="card mb-3 col-md-9">
-                            <div class="card-body">
-                                This is some text within a card body.
-                            </div>
+
+                        <div class="d-flex align-items-center">
+                            Mostrar
+                            <select class="form-select form-select-sm mx-2" aria-label=".form-select-sm example">
+                                <option value="5" selected>5</option>
+                                <option value="10">10</option>
+                                <option value="15">15</option>
+                            </select>
+                            elementos
                         </div>
-                        <div class="card mb-3 col-md-9">
-                            <div class="card-body">
-                                This is some text within a card body.
-                            </div>
+                    </div>
+
+                    <div>
+                        {{#if allPost.length }}
+                            {{#each allPost}}
+                                {{> cardPost this }}
+                            {{/each}}
+                        {{ else }}
+                            <p class="text-muted">No hay post en esta categoria</p>
+                        {{/if}}
+                    </div>
+
+                </div>
+                <div class="tab-pane fade" id="posts-aprobados" role="tabpanel" aria-labelledby="pills-profile-tab">
+
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div class="d-flex align-items-center ms-auto">
+                            Mostrar
+                            <select class="form-select form-select-sm mx-2" aria-label=".form-select-sm example">
+                                <option value="5" selected>5</option>
+                                <option value="10">10</option>
+                                <option value="15">15</option>
+                            </select>
+                            elementos
                         </div>
                     </div>
                     
+                    <div>
+                        {{#if postAccepted.length }}
+                            {{#each postAccepted}}
+                                {{> cardPost this }}
+                            {{/each}}
+                        {{ else }}
+                            <p class="text-muted">No hay post en esta categoria</p>
+                        {{/if}}
+                    </div>
+
                 </div>
                 <div class="tab-pane fade" id="posts-revision" role="tabpanel" aria-labelledby="pills-profile-tab">
-                    Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ipsum eos deleniti itaque molestias
-                    impedit odit quidem doloremque modi unde quod mollitia repudiandae, quaerat ducimus illo, provident
-                    nesciunt ipsam consectetur reprehenderit.
+                    
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div class="d-flex align-items-center ms-auto">
+                            Mostrar
+                            <select class="form-select form-select-sm mx-2" aria-label=".form-select-sm example">
+                                <option value="5" selected>5</option>
+                                <option value="10">10</option>
+                                <option value="15">15</option>
+                            </select>
+                            elementos
+                        </div>
+                    </div>
+
+                    <div>
+                        {{#if postReview.length }}
+                            {{#each postReview}}
+                                {{> cardPost this }}
+                            {{/each}}
+                        {{ else }}
+                            <p class="text-muted">No hay post en esta categoria</p>
+                        {{/if}}
+                    </div>
+
                 </div>
                 <div class="tab-pane fade" id="posts-eliminados" role="tabpanel" aria-labelledby="pills-contact-tab">
-                    Lorem ipsum dolor sit amet consectetur, adipisicing elit. Inventore dolorem vero veritatis nulla
-                    veniam est, error sapiente asperiores fugit voluptate reprehenderit cumque, illo non itaque
-                    perferendis laudantium, quam rem cupiditate!
+                    
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div class="d-flex align-items-center ms-auto">
+                            Mostrar
+                            <select class="form-select form-select-sm mx-2" aria-label=".form-select-sm example">
+                                <option value="5" selected>5</option>
+                                <option value="10">10</option>
+                                <option value="15">15</option>
+                            </select>
+                            elementos
+                        </div>
+                    </div>
+
+                    <div>
+                        {{#if postDeleted.length }}
+                            {{#each postDeleted}}
+                                {{> cardPost this }}
+                            {{/each}}
+                        {{ else }}
+                            <p class="text-muted">No hay post en esta categoria</p>
+                        {{/if}}
+                    </div>
+
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    initSelects();
+</script>
 
 {{> bottomPage }}
