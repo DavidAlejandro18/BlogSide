@@ -39,7 +39,7 @@ const PostSchema = new Schema({
         type: String,
         required: true,
         default: 1,
-        emun: [0, 1, 2, 3] // 0: eliminado, 1: borrador, 2: revision, 3: aprobado
+        emun: [0, 1, 2] // 0: eliminado, 1: revisión, 2: aprobado
     }
 }, {
     timestamps: true
