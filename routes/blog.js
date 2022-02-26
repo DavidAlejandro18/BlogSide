@@ -7,6 +7,11 @@ const { validarJWT, validarCampos, validarBaner } = require('../middlewares');
 
 router.get('/', ctrlBlog.getPosts);
 
+router.get('/getInfoPost', [
+    validarJWT,
+    validarCampos
+], ctrlBlog.getInfoPost);
+
 router.get('/:url?', ctrlBlog.getURLPost);
 
 router.post('/create-post', [

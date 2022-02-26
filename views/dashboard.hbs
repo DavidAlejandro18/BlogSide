@@ -5,136 +5,74 @@
 
     <div class="main">
         <div class="container p-3">
-            <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#posts" type="button"
-                        role="tab">Todos los post</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" data-bs-toggle="pill" data-bs-target="#posts-aprobados" type="button"
-                        role="tab">Post en Aprobados</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" data-bs-toggle="pill" data-bs-target="#posts-revision" type="button"
-                        role="tab">Post en revisión</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" data-bs-toggle="pill" data-bs-target="#posts-eliminados" type="button"
-                        role="tab">Post eliminados</button>
-                </li>
-            </ul>
-            <div class="tab-content">
-                <div class="tab-pane fade show active" id="posts" role="tabpanel" aria-labelledby="pills-home-tab">
-                    
-                    <div class="d-flex align-items-center justify-content-between mb-3">
+            
+            <div>
+                {{!-- Controles de busqueda --}}
+                <div class="d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center gap-2" id = "controllers">
                         <div>
-                            <a class="btn btn-outline-primary" href="./create-post">Crear nuevo post</a>
+                            Status: 
+                            <select class="form-select form-select-sm" id="selectStatus">
+                                <option value="all" selected>Todos</option>
+                                <option value="2">Aprobados</option>
+                                <option value="1">En revisión</option>
+                                <option value="0">Eliminados</option>
+                            </select>
                         </div>
 
-                        <div class="d-flex align-items-center">
-                            Mostrar
-                            <select class="form-select form-select-sm mx-2" aria-label=".form-select-sm example">
-                                <option value="5" selected>5</option>
-                                <option value="10">10</option>
-                                <option value="15">15</option>
+                        <div>
+                            Ordenar por: 
+                            <select class="form-select form-select-sm" id="selectOrder">
+                                <option value="desc" selected>Más nuevos</option>
+                                <option value="asc">Más viejos</option>
                             </select>
-                            elementos
+                        </div>
+                        
+                        <div>
+                            Mostrar: 
+                            <select class="form-select form-select-sm" id="selectLimit">
+                                <option value="5" selected>5 elementos</option>
+                                <option value="10">10 elementos</option>
+                                <option value="15">15 elementos</option>
+                                <option value="20">20 elementos</option>
+                                <option value="25">25 elementos</option>
+                            </select>
                         </div>
                     </div>
 
                     <div>
-                        {{#if allPost.length }}
-                            {{#each allPost}}
-                                {{> cardPost this }}
-                            {{/each}}
-                        {{ else }}
-                            <p class="text-muted">No hay post en esta categoria</p>
-                        {{/if}}
+                        <a class="btn btn-outline-primary" href="./create-post">Crear nuevo post</a>
                     </div>
-
                 </div>
-                <div class="tab-pane fade" id="posts-aprobados" role="tabpanel" aria-labelledby="pills-profile-tab">
 
-                    <div class="d-flex align-items-center justify-content-between mb-3">
-                        <div class="d-flex align-items-center ms-auto">
-                            Mostrar
-                            <select class="form-select form-select-sm mx-2" aria-label=".form-select-sm example">
-                                <option value="5" selected>5</option>
-                                <option value="10">10</option>
-                                <option value="15">15</option>
-                            </select>
-                            elementos
-                        </div>
-                    </div>
-                    
-                    <div>
-                        {{#if postAccepted.length }}
-                            {{#each postAccepted}}
-                                {{> cardPost this }}
-                            {{/each}}
-                        {{ else }}
-                            <p class="text-muted">No hay post en esta categoria</p>
-                        {{/if}}
-                    </div>
-
-                </div>
-                <div class="tab-pane fade" id="posts-revision" role="tabpanel" aria-labelledby="pills-profile-tab">
-                    
-                    <div class="d-flex align-items-center justify-content-between mb-3">
-                        <div class="d-flex align-items-center ms-auto">
-                            Mostrar
-                            <select class="form-select form-select-sm mx-2" aria-label=".form-select-sm example">
-                                <option value="5" selected>5</option>
-                                <option value="10">10</option>
-                                <option value="15">15</option>
-                            </select>
-                            elementos
-                        </div>
-                    </div>
-
-                    <div>
-                        {{#if postReview.length }}
-                            {{#each postReview}}
-                                {{> cardPost this }}
-                            {{/each}}
-                        {{ else }}
-                            <p class="text-muted">No hay post en esta categoria</p>
-                        {{/if}}
-                    </div>
-
-                </div>
-                <div class="tab-pane fade" id="posts-eliminados" role="tabpanel" aria-labelledby="pills-contact-tab">
-                    
-                    <div class="d-flex align-items-center justify-content-between mb-3">
-                        <div class="d-flex align-items-center ms-auto">
-                            Mostrar
-                            <select class="form-select form-select-sm mx-2" aria-label=".form-select-sm example">
-                                <option value="5" selected>5</option>
-                                <option value="10">10</option>
-                                <option value="15">15</option>
-                            </select>
-                            elementos
-                        </div>
-                    </div>
-
-                    <div>
-                        {{#if postDeleted.length }}
-                            {{#each postDeleted}}
-                                {{> cardPost this }}
-                            {{/each}}
-                        {{ else }}
-                            <p class="text-muted">No hay post en esta categoria</p>
-                        {{/if}}
-                    </div>
-
-                </div>
+                <div class = "pt-3" id = "postContainer"></div>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-    initSelects();
+    // INICIAMOS EL FILTRO AL ENTRAR A LA PÁGINA
+    let status = document.querySelector("#selectStatus").value;
+    let order = document.querySelector("#selectOrder").value;
+    let limit = document.querySelector("#selectLimit").value;
+
+    filterPost(status, order, limit, "postContainer", '{{ token }}');
+
+    // EJECUTAMOS EL FILTRO AL CAMBIAR EL SELECT
+    let selects = document.querySelectorAll("#controllers select");
+
+    selects.forEach(select => {
+        select.addEventListener("change", function() {
+            let status = document.querySelector("#selectStatus").value;
+            let order = document.querySelector("#selectOrder").value;
+            let limit = document.querySelector("#selectLimit").value;
+
+            filterPost(status, order, limit, "postContainer", '{{ token }}');
+        });
+    })
+
+    
 </script>
 
 {{> bottomPage }}

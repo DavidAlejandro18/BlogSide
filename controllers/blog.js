@@ -11,6 +11,34 @@ const getPosts = (req, res) => {
     res.send("Vamos a ver todos los post");
 }
 
+const getInfoPost = async (req, res) => {
+    const { status, limit, orderBy } = req.query;
+    let query = {};
+
+    if(status != "all") {
+        query.estado = status;
+    }
+
+    if(isNaN(limit)) {
+        return res.status(400).json({
+            msg: 'El limite debe ser un número entero'
+        });
+    }
+
+    if(!["asc", "desc", "ascending", "descending", "1", "-1"].includes(orderBy)) {
+        return res.status(400).json({
+            msg: 'El orden deben ser alguno de estos valores: [asc, desc, ascending, descending, 1, -1]'
+        });
+    }
+
+    let posts = await Post.find(query).limit(Number(limit)).sort({ createdAt: orderBy }).populate('creadoPor', 'username -_id').select("-_id");
+
+    res.json({
+        total: posts.length,
+        posts
+    });
+}
+
 const getURLPost = (req, res) => {
     res.send("Obtenemos el post con la url: " + req.params.url);
 }
@@ -82,6 +110,7 @@ const createPost = async (req, res) => {
 
 module.exports = {
     getPosts,
+    getInfoPost,
     getURLPost,
     createPost
 };
