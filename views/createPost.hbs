@@ -96,6 +96,8 @@
         e.preventDefault();
         e.stopPropagation();
 
+        let idForm = this.id;
+
         if (this.checkValidity()) {
             let data = new FormData();
             data.append('titulo', $('#tituloPost').val());
@@ -111,8 +113,8 @@
                 }
             };
 
-            $(`#${this.id} button[type='submit']`).prop('disabled', true);
-            $(`#${this.id} button[type='submit']`).html(`
+            $(`#${idForm} button[type='submit']`).prop('disabled', true);
+            $(`#${idForm} button[type='submit']`).html(`
                 <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                 Generando post...
             `);
@@ -121,14 +123,15 @@
                 .then(function (response) {
 
                     if (response.status == 200) {
-                        $(`#${this.id} button[type='submit']`).prop('disabled', false);
-                        $(`#${this.id} button[type='submit']`).val(`Publicar`);
+                        $(`#${idForm} button[type='submit']`).html(`Post generado`);
                         window.open(`./blog/${response.data.url}`);
                         window.location.href = `./dashboard`;
                     }
 
                 })
                 .catch(function (error) {
+                    $(`#${idForm} button[type='submit']`).prop('disabled', false);
+                    $(`#${idForm} button[type='submit']`).html(`Intentar de nuevo`);
                     const notificationAudio = new Audio("./audio/notification.wav")
                     notificationAudio.play();
                     $('#notifyFail').toast('show');
