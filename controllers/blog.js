@@ -39,8 +39,25 @@ const getInfoPost = async (req, res) => {
     });
 }
 
-const getURLPost = (req, res) => {
-    res.send("Obtenemos el post con la url: " + req.params.url);
+const getURLPost = async (req, res) => {
+    const { url } = req.params;
+    const post = await Post.find({ url }).populate('creadoPor', 'nombre img correo -_id').select('-_id').lean();
+    const { content: urlContent, ...dataPost } = post[0];
+    let contentHTML = '';
+
+    if(!fs.existsSync(path.join(__dirname, `../contents/${urlContent}`))) {
+        contentHTML = `
+            <h4 class = "text-center text-muted fst-italic">No se encontró el contenido</h4>
+        `;
+    } else {
+        contentHTML = fs.readFileSync(path.join(__dirname, `../contents/${urlContent}`), 'utf8');
+        contentHTML = contentHTML.replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+    }
+
+    res.render('post', {
+        contentHTML,
+        dataPost
+    });
 }
 
 const createPost = async (req, res) => {

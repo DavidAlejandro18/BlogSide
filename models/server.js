@@ -88,19 +88,20 @@ class Server {
                 }
             },
             prettyDate: function(value, options) {
+                // convert 2022-02-20T00:00:00.000Z to Saturday, February 19, 2022
                 let date = new Date(value);
-
-                let day = date.getDate();
-                let month = date.getMonth() + 1;
+                let day = date.toLocaleString('default', { weekday: 'long' });
+                let month = date.toLocaleString('default', { month: 'long' });
+                let dayOfMonth = date.getDate();
                 let year = date.getFullYear();
 
-                let hours = date.getHours(); 
-                let minutes = date.getMinutes();
+                day = day.charAt(0).toUpperCase() + day.slice(1);
+                month = month.charAt(0).toUpperCase() + month.slice(1);
 
-                let date_format = `${day}/${month}/${year}`;
-                let time_format = `${hours}:${minutes}`;
-
-                return `${date_format} a las ${time_format} horas`;
+                return `${day}, ${month} ${dayOfMonth}, ${year}`;
+            },
+            json: function(value) {
+                return JSON.stringify(value);
             }
         });
     }
