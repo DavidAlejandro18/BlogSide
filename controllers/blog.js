@@ -55,6 +55,15 @@ const createPost = async (req, res) => {
     url = url.normalize('NFD').replace(/[\u0300-\u036f]/g, ""); // SUSTITUIMOS LOS ACENTOS CON LETRAS NORMALES
     url = url.replace(/[^a-z0-9-]/g, ''); // ELIMINAMOS LOS CARACTERES ESPECIALES
 
+    // VERIFICAMOS SI EXISTE EL URL
+    let existeURL = await Post.countDocuments({ url });
+
+    if(existeURL > 0) {
+        return res.status(400).json({
+            msg: 'Este titulo ya existe'
+        });
+    }
+
     // OBTENEMOS LA IMAGEN DEL BANER
     const baner = req.files.baner;
 
@@ -70,21 +79,35 @@ const createPost = async (req, res) => {
 
     // SUBIMOS LA IMAGEN DEL BANER A CLOUDINARY
     const { tempFilePath } = baner;
-    const { secure_url } = await cloudinary.uploader.upload(tempFilePath, { folder: 'baners' });
+    const { secure_url } = await cloudinary.uploader.upload(tempFilePath, { folder: 'baners' }, (err) => {
+        if(err) {
+            return res.status(500).json({
+                msg: 'Error al subir la imagen -> ' + err.message
+            });
+        }
+    });
 
     // GUARDAMOS LAS IMAGENES DEL CONTENIDO EN CLOUDINARY
     const imgs = content.match(/<img[^>]+>/g);
 
-    await Promise.all(imgs.map(async (img) => {
-        let base64 = img.match(/src="[^"]+"/g)[0].replace(/src="|"/g, '');
-
-        if (base64.substr(0, 4) != 'http') {
-            const { secure_url: secure_url_image_post } = await cloudinary.uploader.upload(base64, { folder: 'posts' });
-
-            content = content.replace(`src="${base64}"`, `src="${secure_url_image_post}"`);
-        }
-    }));
-
+    if(imgs) {
+        await Promise.all(imgs.map(async (img) => {
+            let base64 = img.match(/src="[^"]+"/g)[0].replace(/src="|"/g, '');
+    
+            if (base64.substr(0, 4) != 'http') {
+                const { secure_url: secure_url_image_post } = await cloudinary.uploader.upload(base64, { folder: 'posts' }, (err) => {
+                    if(err) {
+                        return res.status(500).json({
+                            msg: 'Error al subir la imagen del contenido -> ' + err.message
+                        });
+                    }
+                });
+    
+                content = content.replace(`src="${base64}"`, `src="${secure_url_image_post}"`);
+            }
+        }));
+    }
+    
     // GUARDAMOS EL CONTENIDO DEL POST EN EL SERVIDOR
     const pathContent = path.join(__dirname, `../contents/${url}.html`);
     await fs.writeFile(pathContent, content, (err) => {
