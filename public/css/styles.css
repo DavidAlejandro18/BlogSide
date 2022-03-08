@@ -72,6 +72,7 @@
 
 .card-post {
     max-width: 60%;
+    max-height: 170px;
 }
 
 .img-card-post {
@@ -80,8 +81,19 @@
     object-fit: cover;
 }
 
+.bg-image-card-post {
+    background-position: center;
+    background-size: cover;
+}
+
 @media (min-width: 1400px) {
     .container, .container-lg, .container-md, .container-sm, .container-xl, .container-xxl {
         max-width: 70rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .card-post {
+        max-width: 100%;
     }
 }

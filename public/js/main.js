@@ -50,9 +50,7 @@ function filterPost(status, orderBy, limit, idContainer, token) {
                             <div class="card mb-3 card-post">
                                 <a href="./blog/${post.url}" class="text-decoration-none text-dark" target="blank">
                                     <div class="row g-0">
-                                        <div class="col-md-4">
-                                            <img src="${post.baner}" class="img-fluid rounded-start" loading="lazy" style = "width: 100%;height: 100%;object-fit: cover;">
-                                        </div>
+                                        <div class="col-md-4 bg-light rounded-start bg-image-card-post" style = "background-image: url('${post.baner}');"></div>
                                         <div class="col-md-8">
                                             <div class="card-body">
                                                 <h5 class="card-title">${post.titulo}</h5>
