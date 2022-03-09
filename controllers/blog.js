@@ -42,19 +42,27 @@ const getInfoPost = async (req, res) => {
 const getURLPost = async (req, res) => {
     const { url } = req.params;
     const post = await Post.find({ url }).populate('creadoPor', 'nombre img correo -_id').select('-_id').lean();
+
+    if(!post[0]) {
+        return res.status(404).render('404', {
+            title: 'BlogSide | Página no encontrada'
+        });
+    }
+
     const { content: urlContent, ...dataPost } = post[0];
     let contentHTML = '';
 
-    if(!fs.existsSync(path.join(__dirname, `../contents/${urlContent}`))) {
-        contentHTML = `
-            <h4 class = "text-center text-muted fst-italic">No se encontró el contenido</h4>
-        `;
+    if(!fs.existsSync(path.join(__dirname, `../contents/${urlContent}`)) || (dataPost.estado != "2" && !req.session.token)) {
+        return res.status(404).render('404', {
+            title: 'BlogSide | Página no encontrada'
+        });
     } else {
         contentHTML = fs.readFileSync(path.join(__dirname, `../contents/${urlContent}`), 'utf8');
         contentHTML = contentHTML.replace(/&lt;/g, '<').replace(/&gt;/g, '>');
     }
 
     res.render('post', {
+        title: `BlogSide | ${dataPost.titulo}`,
         contentHTML,
         dataPost
     });
