@@ -12,6 +12,11 @@ router.get('/getInfoPost', [
     validarCampos
 ], ctrlBlog.getInfoPost);
 
+router.get('/getTags', [
+    check('termino', 'El termino de referencia es obligatorio').not().isEmpty(),
+    validarCampos
+], ctrlBlog.getTags);
+
 router.get('/:url?', ctrlBlog.getURLPost);
 
 router.post('/create-post', [
@@ -19,6 +24,7 @@ router.post('/create-post', [
     validarBaner,
     check('titulo', 'El titulo es obligatorio').not().isEmpty(),
     check('content', 'El contenido es obligatorio').not().isEmpty(),
+    check('tags', 'Las etiquetas son obligatorias').not().isEmpty(),
     validarCampos
 ], ctrlBlog.createPost);
 

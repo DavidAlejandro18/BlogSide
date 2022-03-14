@@ -40,7 +40,8 @@ const PostSchema = new Schema({
         required: true,
         default: 1,
         emun: [0, 1, 2] // 0: eliminado, 1: revisión, 2: aprobado
-    }
+    },
+    tags: [String]
 }, {
     timestamps: true
 });

@@ -74,23 +74,34 @@
                 </div>
                 <div class="col-md-3 mt-4">
                     <div class="border rounded-3 p-3">
-                        Compartir
-                        <div class="d-flex align-items-center justify-content-evenly">
-                            <a class="social-link"
-                                href="https://www.facebook.com/sharer/sharer.php?u=https://blogside.herokuapp.com/blog/{{ dataPost.url }}"
-                                target="blank">
-                                <i class="bi bi-facebook" style="font-size: 2.1rem;"></i>
-                            </a>
-                            <a class="social-link"
-                                href="http://twitter.com/share?text={{ dataPost.titulo }}&url=https://blogside.herokuapp.com/blog/{{ dataPost.url }}&hashtags=blogside,node"
-                                target="blank">
-                                <i class="bi bi-twitter" style="font-size: 2.1rem;"></i>
-                            </a>
-                            <a class="social-link"
-                                href="https://www.linkedin.com/sharing/share-offsite/?url=https://blogside.herokuapp.com/blog/{{ dataPost.url }}"
-                                target="blank">
-                                <i class="bi bi-linkedin" style="font-size: 2.1rem;"></i>
-                            </a>
+                        <div class="mb-3">
+                            Compartir
+                            <div class="d-flex align-items-center justify-content-evenly">
+                                <a class="social-link"
+                                    href="https://www.facebook.com/sharer/sharer.php?u=https://blogside.herokuapp.com/blog/{{ dataPost.url }}"
+                                    target="blank">
+                                    <i class="bi bi-facebook" style="font-size: 2.1rem;"></i>
+                                </a>
+                                <a class="social-link"
+                                    href="http://twitter.com/share?text={{ dataPost.titulo }}&url=https://blogside.herokuapp.com/blog/{{ dataPost.url }}&hashtags=blogside,node"
+                                    target="blank">
+                                    <i class="bi bi-twitter" style="font-size: 2.1rem;"></i>
+                                </a>
+                                <a class="social-link"
+                                    href="https://www.linkedin.com/sharing/share-offsite/?url=https://blogside.herokuapp.com/blog/{{ dataPost.url }}"
+                                    target="blank">
+                                    <i class="bi bi-linkedin" style="font-size: 2.1rem;"></i>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <p class="mb-1">Tags</p>
+                            <div class="d-flex flex-wrap gap-1">
+                                {{#each dataPost.tags}}
+                                    <span class="badge tag rounded-pill custom-bg-tag">{{ this }}</span>
+                                {{/each}}
+                            </div>
                         </div>
                     </div>
                 </div>

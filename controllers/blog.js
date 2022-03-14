@@ -6,6 +6,7 @@ const cloudinary = require('cloudinary').v2;
 cloudinary.config(process.env.CLOUDINARY_URL);
 
 const Post = require('../models/post');
+const Tag = require('../models/tags');
 
 const getPosts = (req, res) => {
     res.send("Vamos a ver todos los post");
@@ -36,6 +37,19 @@ const getInfoPost = async (req, res) => {
     res.json({
         total: posts.length,
         posts
+    });
+}
+
+const getTags = async (req, res) => {
+    const { termino } = req.query;
+    const regex = new RegExp(termino, 'i');
+
+    let tags = await Tag.find({ tag: regex }).select('tag -_id');
+    tags = tags.map(tag => tag.tag);
+
+    res.json({
+        termino,
+        tags
     });
 }
 
@@ -73,7 +87,7 @@ const createPost = async (req, res) => {
     let archivosPermitidos = ['png', 'jpg', 'jpeg', 'gif'];
 
     // OBTENEMOS EL TITULO Y EL CONTENIDO
-    let { titulo, content } = req.body;
+    let { titulo, content, tags } = req.body;
 
     // GENERAMOS EL URL PERSONALIZADO
     let url = titulo.split(' ').join('-').toLowerCase();
@@ -143,12 +157,40 @@ const createPost = async (req, res) => {
         }
     });
 
+    // GENERAMOS EL ARRAY DE LOS TAGS
+    tags = tags.split(',').map(tag => {
+        tag = tag.trim().toLowerCase(); // ELIMINAMOS LOS ESPACIOS DE ADELANTE Y ATRAS DE CADA TAG Y LO CONVERTIMOS A MINUSCULAS
+        tag = tag.replace(/\s/g, '-'); // REEMPLAZAMOS LOS ESPACIOS ENTRE LETRAS POR GUIONES
+
+        return tag;
+    });
+
+    tags = [...new Set(tags)]; // Eliminamos los duplicados
+
+    // GUARDAMOS CADA TAG EN LA TABLA DE TAGS
+    await Promise.all(tags.map(async (tag) => {
+        const existeTag = await Tag.countDocuments({ tag });
+
+        if(existeTag == 0) {
+            const newTag = new Tag({
+                tag
+            });
+
+            await newTag.save();
+        }
+    })).catch(err => {
+        return res.status(500).json({
+            msg: 'Error al guardar los tags'
+        });
+    });
+
     const newPost = new Post({
         titulo,
         url,
         content: `${url}.html`,
         baner: secure_url,
-        creadoPor: req.usuario._id
+        creadoPor: req.usuario._id,
+        tags
     });
 
     await newPost.save();
@@ -159,6 +201,7 @@ const createPost = async (req, res) => {
 module.exports = {
     getPosts,
     getInfoPost,
+    getTags,
     getURLPost,
     createPost
 };

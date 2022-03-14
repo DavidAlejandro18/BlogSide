@@ -25,12 +25,28 @@
                             </textarea>
                         </div>
 
+                        <div class="mb-3">
+                            <label class="form-label">Tags</label>
+                            <div class = "border rounded-3 p-2">
+                                <div class = "d-inline-block">
+                                    <div class="d-inline" id = "tagListReady">
+                                        {{!-- Aquí van los tags --}}
+                                    </div>
+                                    <autocomplete>
+                                        <input type="text" class="border-0 inputNewTag" autocomplete="off" placeholder="Ingresa los tags del post" id="inputNewTag">
+                                    </autocomplete>
+                                </div>
+                            </div>
+                        </div>
+
                         <button class="btn btn-success" type="submit">Generar post</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
+
+    {{> footer }}
 </div>
 
 {{!-- Notificación fallida --}}
@@ -53,6 +69,78 @@
 </div>
 
 <script>
+    $(document).ready(function() {
+        $(window).keydown(function(event){
+            if(event.keyCode == 13) {
+                event.preventDefault();
+                return false;
+            }
+        });
+    });
+
+    let inputNewTag = document.getElementById("inputNewTag");
+
+    if(inputNewTag) {
+        inputNewTag.addEventListener("keyup", function(event) {
+            if (event.keyCode === 13) {
+                console.log("hizo click en enter");
+                let actualTags = getActualTags();
+                let value = (inputNewTag.value).trim().toLowerCase(); // ELIMINAMOS LOS ESPACIOS DE ADELANTE Y ATRAS DE CADA TAG Y LO CONVERTIMOS A MINUSCULAS
+                value = value.replace(/\s/g, '-');
+
+                if(!actualTags.includes(value) && value != "") {
+                    //$("#tagListReady").append(`<span class="badge tag rounded-pill custom-bg-tag">${value}</span>`);
+                    $("#tagListReady").append(`
+                        <span class="badge tag rounded-pill p-0 ps-2 custom-bg-tag">
+                            ${value}
+                            <button class="p-1 rounded-circle border-0" onclick="this.parentNode.remove()">
+                                <i class="bi bi-x-lg rounded-circle"></i>
+                            </button>
+                        </span>
+                    `);
+                }
+
+                inputNewTag.value = "";
+
+                // close the autocomplete menu if the user presses ENTER.
+                $('#inputNewTag').autocomplete('close');
+            }
+        });
+    }
+
+    $("#inputNewTag").autocomplete({
+        source: function(req, res) {
+            axios.get(`./blog/getTags?termino=${req.term}`)
+                .then(function(result) {
+                    res(result.data.tags);
+                })
+                .catch(function(error) {
+                    console.log(error);
+                });
+        },
+        select: function(event, ui) {
+            console.log("select");
+            event.preventDefault();
+            let actualTags = getActualTags();
+            let value = (ui.item.value).trim().toLowerCase(); // ELIMINAMOS LOS ESPACIOS DE ADELANTE Y ATRAS DE CADA TAG Y LO CONVERTIMOS A MINUSCULAS
+            value = value.replace(/\s/g, '-');
+            
+            if(!actualTags.includes(value)) {
+                //$("#tagListReady").append(`<span class="badge tag rounded-pill custom-bg-tag">${value}</span>`);
+                $("#tagListReady").append(`
+                        <span class="badge tag rounded-pill p-0 ps-2 custom-bg-tag">
+                            ${value}
+                            <button class="p-1 rounded-circle border-0" onclick="this.parentNode.remove()">
+                                <i class="bi bi-x-lg rounded-circle"></i>
+                            </button>
+                        </span>
+                    `);
+            }
+
+            $("#inputNewTag").val("");
+        }
+    });
+
     tinymce.init({
         selector: 'textarea',
         height: 700,
@@ -103,6 +191,7 @@
             data.append('titulo', $('#tituloPost').val());
             data.append('baner', $('#banerPost')[0].files[0]);
             data.append('content', tinymce.activeEditor.getContent());
+            data.append('tags', getActualTags().toString());
 
             let config = {
                 method: 'POST',

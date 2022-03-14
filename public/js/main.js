@@ -77,3 +77,17 @@ function filterPost(status, orderBy, limit, idContainer, token) {
             console.log(error);
         });
 }
+
+function getActualTags() {
+    let actualTags = document.querySelectorAll("#tagListReady span");
+    let tags = [];
+
+    actualTags.forEach(tag => {
+        let value = tag.innerText.trim();
+        if(value != "") {
+            tags.push(value);
+        }
+    });
+
+    return tags;
+}
