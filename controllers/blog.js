@@ -94,108 +94,95 @@ const createPost = async (req, res) => {
     url = url.normalize('NFD').replace(/[\u0300-\u036f]/g, ""); // SUSTITUIMOS LOS ACENTOS CON LETRAS NORMALES
     url = url.replace(/[^a-z0-9-]/g, ''); // ELIMINAMOS LOS CARACTERES ESPECIALES
 
-    // VERIFICAMOS SI EXISTE EL URL
-    let existeURL = await Post.countDocuments({ url });
-
-    if(existeURL > 0) {
-        return res.status(400).json({
-            msg: 'Este titulo ya existe'
-        });
-    }
-
-    // OBTENEMOS LA IMAGEN DEL BANER
-    const baner = req.files.baner;
-
-    // OBTENEMOS LA EXTENSIÓN DEL ARCHIVO
-    const nombreCortado = baner.name.split('.');
-    const extension = nombreCortado[nombreCortado.length - 1];
-
-    if(!archivosPermitidos.includes(extension)) {
-        return res.status(400).json({
-            msg: 'Extension no permitida'
-        });
-    }
-
-    // SUBIMOS LA IMAGEN DEL BANER A CLOUDINARY
-    const { tempFilePath } = baner;
-    const { secure_url } = await cloudinary.uploader.upload(tempFilePath, { folder: 'baners' }, (err) => {
-        if(err) {
-            return res.status(500).json({
-                msg: 'Error al subir la imagen -> ' + err.message
+    try {
+        // VERIFICAMOS SI EXISTE EL URL
+        let existeURL = await Post.countDocuments({ url });
+    
+        if(existeURL > 0) {
+            return res.status(400).json({
+                msg: 'Este titulo ya existe'
             });
         }
-    });
-
-    // GUARDAMOS LAS IMAGENES DEL CONTENIDO EN CLOUDINARY
-    const imgs = content.match(/<img[^>]+>/g);
-
-    if(imgs) {
-        await Promise.all(imgs.map(async (img) => {
-            let base64 = img.match(/src="[^"]+"/g)[0].replace(/src="|"/g, '');
+        
+        // OBTENEMOS LA IMAGEN DEL BANER
+        const baner = req.files.baner;
     
-            if (base64.substr(0, 4) != 'http') {
-                const { secure_url: secure_url_image_post } = await cloudinary.uploader.upload(base64, { folder: 'posts' }, (err) => {
-                    if(err) {
-                        return res.status(500).json({
-                            msg: 'Error al subir la imagen del contenido -> ' + err.message
-                        });
-                    }
+        // OBTENEMOS LA EXTENSIÓN DEL ARCHIVO
+        const nombreCortado = baner.name.split('.');
+        const extension = nombreCortado[nombreCortado.length - 1];
+    
+        if(!archivosPermitidos.includes(extension)) {
+            return res.status(400).json({
+                msg: 'Extension no permitida'
+            });
+        }
+
+        // SUBIMOS LA IMAGEN DEL BANER A CLOUDINARY
+        const { tempFilePath } = baner;
+        const { secure_url } = await cloudinary.uploader.upload(tempFilePath, { folder: 'baners' });
+
+        // GUARDAMOS LAS IMAGENES DEL CONTENIDO EN CLOUDINARY
+        const imgs = content.match(/<img[^>]+>/g);
+    
+        if(imgs) {
+            await Promise.all(imgs.map(async (img) => {
+                let base64 = img.match(/src="[^"]+"/g)[0].replace(/src="|"/g, '');
+        
+                if (base64.substr(0, 4) != 'http') {
+                    const { secure_url: secure_url_image_post } = await cloudinary.uploader.upload(base64, { folder: 'posts' });
+        
+                    content = content.replace(`src="${base64}"`, `src="${secure_url_image_post}"`);
+                }
+            }));
+        }
+        
+        // GUARDAMOS EL CONTENIDO DEL POST EN EL SERVIDOR
+        const pathContent = path.join(__dirname, `../contents/${url}.html`);
+        fs.writeFileSync(pathContent, content);
+        
+        // GENERAMOS EL ARRAY DE LOS TAGS
+        tags = tags.split(',').map(tag => {
+            tag = tag.trim().toLowerCase(); // ELIMINAMOS LOS ESPACIOS DE ADELANTE Y ATRAS DE CADA TAG Y LO CONVERTIMOS A MINUSCULAS
+            tag = tag.replace(/\s/g, '-'); // REEMPLAZAMOS LOS ESPACIOS ENTRE LETRAS POR GUIONES
+    
+            return tag;
+        });
+    
+        tags = [...new Set(tags)]; // Eliminamos los duplicados
+        
+        // GUARDAMOS CADA TAG EN LA TABLA DE TAGS
+        await Promise.all(tags.map(async (tag) => {
+            const existeTag = await Tag.countDocuments({ tag });
+    
+            if(existeTag == 0) {
+                const newTag = new Tag({
+                    tag
                 });
     
-                content = content.replace(`src="${base64}"`, `src="${secure_url_image_post}"`);
+                await newTag.save();
             }
         }));
-    }
-    
-    // GUARDAMOS EL CONTENIDO DEL POST EN EL SERVIDOR
-    const pathContent = path.join(__dirname, `../contents/${url}.html`);
-    await fs.writeFile(pathContent, content, (err) => {
-        if(err) {
-            return res.status(500).json({
-                msg: 'Error al guardar el contenido del post'
-            });
-        }
-    });
 
-    // GENERAMOS EL ARRAY DE LOS TAGS
-    tags = tags.split(',').map(tag => {
-        tag = tag.trim().toLowerCase(); // ELIMINAMOS LOS ESPACIOS DE ADELANTE Y ATRAS DE CADA TAG Y LO CONVERTIMOS A MINUSCULAS
-        tag = tag.replace(/\s/g, '-'); // REEMPLAZAMOS LOS ESPACIOS ENTRE LETRAS POR GUIONES
-
-        return tag;
-    });
-
-    tags = [...new Set(tags)]; // Eliminamos los duplicados
-
-    // GUARDAMOS CADA TAG EN LA TABLA DE TAGS
-    await Promise.all(tags.map(async (tag) => {
-        const existeTag = await Tag.countDocuments({ tag });
-
-        if(existeTag == 0) {
-            const newTag = new Tag({
-                tag
-            });
-
-            await newTag.save();
-        }
-    })).catch(err => {
-        return res.status(500).json({
-            msg: 'Error al guardar los tags'
+        // CREAMOS UNA NUEVA INSTANCIA DEL POST
+        const newPost = new Post({
+            titulo,
+            url,
+            content: `${url}.html`,
+            baner: secure_url,
+            creadoPor: req.usuario._id,
+            tags
         });
-    });
 
-    const newPost = new Post({
-        titulo,
-        url,
-        content: `${url}.html`,
-        baner: secure_url,
-        creadoPor: req.usuario._id,
-        tags
-    });
-
-    await newPost.save();
-
-    res.json(newPost);
+        // GUARDAMOS EL POST EN LA BASE DE DATOS
+        await newPost.save();
+    
+        // RETORNAMOS LA RESPUESTA
+        res.json(newPost);
+    } catch (error) {
+        res.status(500).json({
+            msg: 'Hubo un error al crear el post -> ' + error.message
+        });   
+    }
 }
 
 module.exports = {
