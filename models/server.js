@@ -5,6 +5,7 @@ const hbs = require('hbs');
 const path = require('path');
 const cors = require('cors');
 const session = require('express-session');
+const MongoStore = require('connect-mongo');
 const dbConnection = require('../database/config');
 
 class Server {
@@ -44,7 +45,10 @@ class Server {
                 path: '/',
                 maxAge: 4 * 60 * 60 * 1000,
                 httpOnly: true
-            }
+            },
+            store: MongoStore.create({
+                mongoUrl: process.env.MONGODB_CNN
+            })
         }));
         
         this.app.use(cors());
