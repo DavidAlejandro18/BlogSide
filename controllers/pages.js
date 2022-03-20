@@ -1,5 +1,8 @@
 //@ts-check
 const Post = require('../models/post');
+const { isValidObjectId } = require("mongoose");
+const path = require('path');
+const fs = require('fs');
 
 const ctrlIndex = (req, res) => {
     res.render("index", {
@@ -42,6 +45,36 @@ const ctrlCreatePost = (req, res) => {
     });
 }
 
+const ctrlEditPost = async (req, res) => {
+    const { id } = req.params;
+    const isValid = isValidObjectId(id);
+
+    if(!isValid) {
+        return res.redirect('/dashboard');
+    }
+
+    const post = await Post.findById(id).lean();
+
+    const { content: urlContent, ...dataPost } = post;
+    let contentHTML = '';
+
+    if(!fs.existsSync(path.join(__dirname, `../contents/${urlContent}`)) || (dataPost.estado != "2" && !req.session.token)) {
+        return res.status(404).render('404', {
+            title: 'BlogSide | Página no encontrada'
+        });
+    } else {
+        contentHTML = fs.readFileSync(path.join(__dirname, `../contents/${urlContent}`), 'utf8');
+    }
+
+    res.render('editPost', {
+        title: 'BlogSide | Editar post',
+        usuario: req.session.usuario,
+        token: req.session.token,
+        dataPost,
+        contentHTML
+    });
+}
+
 const ctrlSettings = (req, res) => {
     res.send("Settings");
 }
@@ -62,6 +95,7 @@ module.exports = {
     ctrlLogout,
     ctrlDashboard,
     ctrlCreatePost,
+    ctrlEditPost,
     ctrlSettings,
     ctrlUsername,
     ctrlUsuariosLista

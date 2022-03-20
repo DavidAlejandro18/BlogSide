@@ -5,32 +5,40 @@
 
     <div class="main">
         <div class="container p-3">
-            <h3>Crear nuevo post</h3>
+            <h3>Editar post</h3>
 
             <div class="row">
                 <div class="col-md-10">
-                    <form id = "formPublicar">
+                    <form id="formEditar">
                         <div class="mb-3">
                             <label for="banerPost" class="form-label">Baner</label>
-                            <input class="form-control" id="banerPost" type="file" accept="image/*" required>
+                            <input class="form-control" id="banerPost" type="file" accept="image/*" >
+                            <a href="{{ dataPost.baner }}" target="_blank" rel="noopener noreferrer">Imagen actual</a>
                         </div>
                         <div class="mb-3">
                             <label for="tituloPost" class="form-label">Titulo</label>
-                            <input type="text" class="form-control" id="tituloPost" placeholder="Ej: ¿Cómo usar Postman?" required>
+                            <input type="text" class="form-control" id="tituloPost" placeholder="Ej: ¿Cómo usar Postman?" value="{{dataPost.titulo}}" required>
                         </div>
                         <div class="mb-3">
                             <label for="contenidoPost" class="form-label">Contenido</label>
                             <textarea id = "contenidoPost">
-                                ¿De qué vas a escribir hoy?
+                                {{contentHTML}}
                             </textarea>
                         </div>
-
                         <div class="mb-3">
                             <label class="form-label">Tags</label>
                             <div class = "border rounded-3 p-2">
                                 <div class = "d-inline-block">
                                     <div class="d-inline" id = "tagListReady">
                                         {{!-- Aquí van los tags --}}
+                                        {{#each dataPost.tags}}
+                                            <span class="badge tag rounded-pill p-0 ps-2 custom-bg-tag">
+                                                {{this}}
+                                                <button class="p-1 rounded-circle border-0" onclick="this.parentNode.remove()">
+                                                    <i class="bi bi-x-lg rounded-circle"></i>
+                                                </button>
+                                            </span>
+                                        {{/each}}
                                     </div>
                                     <autocomplete>
                                         <input type="text" class="border-0 inputNewTag" autocomplete="off" placeholder="Ingresa los tags del post" id="inputNewTag">
@@ -39,7 +47,7 @@
                             </div>
                         </div>
 
-                        <button class="btn btn-success" type="submit">Generar post</button>
+                        <button class="btn btn-success" type="submit">Editar post</button>
                     </form>
                 </div>
             </div>
@@ -47,25 +55,6 @@
     </div>
 
     {{> footer }}
-</div>
-
-{{!-- Notificación fallida --}}
-<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
-    <div id="notifyFail" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true">
-        <div class="toast-header">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="rgb(236, 29, 51)"
-                class="bi bi-bell-fill me-2" viewBox="0 0 16 16">
-                <path
-                    d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zm.995-14.901a1 1 0 1 0-1.99 0A5.002 5.002 0 0 0 3 6c0 1.098-.5 6-2 7h14c-1.5-1-2-5.902-2-7 0-2.42-1.72-4.44-4.005-4.901z" />
-            </svg>
-            <strong class="me-auto">Error</strong>
-            <small>Ahora</small>
-            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-        </div>
-        <div class="toast-body">
-            Algo salio mal: <span class="fst-italic" id="msgError">Error indefinido</span>
-        </div>
-    </div>
 </div>
 
 <script>
@@ -82,7 +71,7 @@
 
     setTinyMCE("textarea");
 
-    $("#formPublicar").on("submit", function (e) {
+    $("#formEditar").on("submit", function (e) {
         e.preventDefault();
         e.stopPropagation();
 
@@ -90,14 +79,15 @@
 
         if (this.checkValidity()) {
             let data = new FormData();
+            data.append('id', '{{ dataPost._id }}');
             data.append('titulo', $('#tituloPost').val());
             data.append('baner', $('#banerPost')[0].files[0]);
             data.append('content', tinymce.activeEditor.getContent());
             data.append('tags', getActualTags().toString());
 
             let config = {
-                method: 'POST',
-                url: './blog/create-post',
+                method: 'PUT',
+                url: '/blog/edit-post',
                 data,
                 headers: {
                     "x-token": `{{ token }}`
@@ -107,7 +97,7 @@
             $(`#${idForm} button[type='submit']`).prop('disabled', true);
             $(`#${idForm} button[type='submit']`).html(`
                 <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                Generando post...
+                Editando post...
             `);
 
             axios(config)
@@ -115,8 +105,8 @@
 
                     if (response.status == 200) {
                         $(`#${idForm} button[type='submit']`).html(`Post generado`);
-                        window.open(`./blog/${response.data.url}`);
-                        window.location.href = `./dashboard`;
+                        window.open(`/blog/${response.data.url}`);
+                        window.location.href = `/dashboard`;
                     }
 
                 })

@@ -1,5 +1,6 @@
 // @ts-check
 const { Router } = require('express');
+const { check } = require('express-validator');
 const router = Router();
 const { validarLogin, validarPaginasUsuario, validarPaginaSuperUsuario } = require('../middlewares');
 const controllerPages = require('../controllers/pages');
@@ -21,6 +22,11 @@ router.get('/dashboard', [
 router.get('/create-post', [
     validarPaginasUsuario
 ], controllerPages.ctrlCreatePost);
+
+router.get('/edit-post/:id', [
+    validarPaginasUsuario,
+    check('id', "El ID es obligatorio").not().isEmpty()
+], controllerPages.ctrlEditPost);
 
 router.get("/settings", [
     validarPaginasUsuario

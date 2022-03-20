@@ -28,4 +28,13 @@ router.post('/create-post', [
     validarCampos
 ], ctrlBlog.createPost);
 
+router.put('/edit-post', [
+    validarJWT,
+    check('id', 'El ID es obligatorio').isMongoId(),
+    check('titulo', 'El titulo es obligatorio').not().isEmpty(),
+    check('content', 'El contenido es obligatorio').not().isEmpty(),
+    check('tags', 'Las etiquetas son obligatorias').not().isEmpty(),
+    validarCampos
+], ctrlBlog.updatePost);
+
 module.exports = router;

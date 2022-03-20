@@ -7,6 +7,7 @@ cloudinary.config(process.env.CLOUDINARY_URL);
 
 const Post = require('../models/post');
 const Tag = require('../models/tags');
+const archivosPermitidos = ['png', 'jpg', 'jpeg', 'gif'];
 
 const getPosts = (req, res) => {
     res.send("Vamos a ver todos los post");
@@ -32,7 +33,7 @@ const getInfoPost = async (req, res) => {
         });
     }
 
-    let posts = await Post.find(query).limit(Number(limit)).sort({ createdAt: orderBy }).populate('creadoPor', 'username -_id').select("-_id");
+    let posts = await Post.find(query).limit(Number(limit)).sort({ createdAt: orderBy }).populate('creadoPor', 'username -_id');
 
     res.json({
         total: posts.length,
@@ -83,8 +84,6 @@ const getURLPost = async (req, res) => {
 }
 
 const createPost = async (req, res) => {
-
-    let archivosPermitidos = ['png', 'jpg', 'jpeg', 'gif'];
 
     // OBTENEMOS EL TITULO Y EL CONTENIDO
     let { titulo, content, tags } = req.body;
@@ -185,10 +184,110 @@ const createPost = async (req, res) => {
     }
 }
 
+const updatePost = async (req, res) => {
+    try {
+        let { id, titulo, content, tags }  = req.body;
+        let newDataPost = {}
+
+        // OBTENEMOS EL POST
+        let post = await Post.findById(id).populate('creadoPor', 'username -_id').lean();
+
+        // SI HAY UN NUEVO BANER, O SUBIMOS A CLOUDINARY Y GUARDAMOS EL NUEVO ENLACE
+        if (req.files && req.files.baner) {
+            const baner = req.files.baner;
+    
+            // OBTENEMOS LA EXTENSIÓN DEL ARCHIVO
+            const nombreCortado = baner.name.split('.');
+            const extension = nombreCortado[nombreCortado.length - 1];
+        
+            if(!archivosPermitidos.includes(extension)) {
+                return res.status(400).json({
+                    msg: 'El archivo para el baner no es valida'
+                });
+            }
+
+            // SUBIMOS LA NUEVA IMAGEN DEL BANER A CLOUDINARY
+            const { tempFilePath } = baner;
+            const { secure_url } = await cloudinary.uploader.upload(tempFilePath, { folder: 'baners' });
+            
+            // ELIMINAMOS LA IMAGEN ACTUAL DEL BANER DE CLOUDINARY
+            const [ baner_image_id ] = (post.baner.split('/')).pop().split("."); 
+            await cloudinary.uploader.destroy("baners/" + baner_image_id);
+
+            newDataPost.baner = secure_url;
+        }
+
+        // REESCRIBIMOS LA URL DEL POST MEDIANTE EL NUEVO TITULO
+        let url = titulo.split(' ').join('-').toLowerCase();
+        url = url.normalize('NFD').replace(/[\u0300-\u036f]/g, ""); // SUSTITUIMOS LOS ACENTOS CON LETRAS NORMALES
+        url = url.replace(/[^a-z0-9-]/g, ''); // ELIMINAMOS LOS CARACTERES ESPECIALES
+        newDataPost.url = url;
+
+        // GUARDAMOS LAS IMAGENES DEL CONTENIDO EN CLOUDINARY
+        const imgs = content.match(/<img[^>]+>/g);
+    
+        if(imgs) {
+            await Promise.all(imgs.map(async (img) => {
+                let base64 = img.match(/src="[^"]+"/g)[0].replace(/src="|"/g, '');
+        
+                if (base64.substr(0, 4) != 'http') {
+                    const { secure_url: secure_url_image_post } = await cloudinary.uploader.upload(base64, { folder: 'posts' });
+        
+                    content = content.replace(`src="${base64}"`, `src="${secure_url_image_post}"`);
+                }
+            }));
+        }
+
+        // REESCRIBIMOS EL CONTENIDO DEL ARCHIVO HTML
+        let pathContent = path.join(__dirname, `../contents/${post.content}`);
+        fs.writeFileSync(pathContent, content);
+        
+        // GENERAMOS EL ARRAY DE LOS NUEVOS TAGS
+        tags = tags.split(',').map(tag => {
+            tag = tag.trim().toLowerCase();
+            tag = tag.replace(/\s/g, '-');
+    
+            return tag;
+        });
+    
+        tags = [...new Set(tags)]; // Eliminamos los duplicados
+        newDataPost.tags = tags;
+
+        // GUARDAMOS NUEVOS TAGS EN LA TABLA DE TAGS (EN CASO DE QUE HAYAN NUEVOS)
+        await Promise.all(tags.map(async (tag) => {
+            const existeTag = await Tag.countDocuments({ tag });
+
+            if(existeTag == 0) {
+                const newTag = new Tag({
+                    tag
+                });
+
+                await newTag.save();
+            }
+        }));
+
+        newDataPost.titulo = titulo;
+
+        // ACTUALIZAMOS EL POST
+        await Post.findByIdAndUpdate(id, newDataPost, { new: true });
+
+        res.json({
+            msg: 'Post actualizado correctamente',
+            url
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            msg: "Hubo un error al editar el post -> " + error.message
+        });
+    }
+}
+
 module.exports = {
     getPosts,
     getInfoPost,
     getTags,
     getURLPost,
-    createPost
+    createPost,
+    updatePost
 };
