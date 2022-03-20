@@ -17,7 +17,7 @@ function prettyDate(value) {
 function filterPost(status, orderBy, limit, idContainer, token) {
     var config = {
         method: 'get',
-        url: `http://localhost:4000/blog/getInfoPost?status=${status}&limit=${limit}&orderBy=${orderBy}`,
+        url: `/blog/getInfoPost?status=${status}&limit=${limit}&orderBy=${orderBy}`,
         headers: { 
             'x-token': token,
         }
