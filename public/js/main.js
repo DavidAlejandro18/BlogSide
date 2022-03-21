@@ -14,10 +14,15 @@ function prettyDate(value) {
     return `${date_format} a las ${time_format} horas`;
 }
 
-function filterPost(status, orderBy, limit, idContainer, token) {
+function filterPost(data, token) {
+
+    if(typeof data != "object" || !data.status || !data.orderBy || !data.limit || !data.idContainer || !token) {
+        throw new Error("No hay suficientes parametros");
+    }
+
     var config = {
         method: 'get',
-        url: `/blog/getInfoPost?status=${status}&limit=${limit}&orderBy=${orderBy}`,
+        url: `/blog/getInfoPost?text=${data.text}&status=${data.status}&limit=${data.limit}&orderBy=${data.orderBy}`,
         headers: { 
             'x-token': token,
         }
@@ -33,7 +38,7 @@ function filterPost(status, orderBy, limit, idContainer, token) {
                 let htmlPost = '';
 
                 if(total == 0) {
-                    document.getElementById(`${idContainer}`).innerHTML = "<p>No hay post con estas especificaciones</p>";
+                    document.getElementById(`${data.idContainer}`).innerHTML = "<p>No hay post con estas especificaciones</p>";
                 } else {
                     posts.forEach(post => {
                         let badgeStatus = '';
@@ -108,7 +113,7 @@ function filterPost(status, orderBy, limit, idContainer, token) {
                         `;
                     });
 
-                    document.getElementById(`${idContainer}`).innerHTML = htmlPost;
+                    document.getElementById(`${data.idContainer}`).innerHTML = htmlPost;
                 }
 
             }
@@ -262,7 +267,15 @@ function changeStatus(option) {
         .then(function (response) {
             
             if(response.status == 200) {
-                filterPost($("#selectStatus").val(), $("#selectOrder").val(), $("#selectLimit").val(), "postContainer", localStorage.getItem("token"));
+                let configSearch = {
+                    text: $("#inputSearch").val(),
+                    status: $("#selectStatus").val(),
+                    orderBy: $("#selectOrder").val(),
+                    limit: $("#selectLimit").val(),
+                    idContainer: "postContainer"
+                };
+
+                filterPost(configSearch, localStorage.getItem("token"));
             }
 
         })

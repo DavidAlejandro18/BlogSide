@@ -11,6 +11,10 @@
                 <div class="d-flex flex-wrap gap-3 align-items-center justify-content-between">
                     <div class="d-flex align-items-center gap-2" id = "controllers">
                         <div>
+                            Buscar
+                            <input type="search" class="form-control form-control-sm" id="inputSearch" placeholder="Busqueda">
+                        </div>
+                        <div>
                             Status: 
                             <select class="form-select form-select-sm" id="selectStatus">
                                 <option value="all" selected>Todos</option>
@@ -55,22 +59,30 @@
 
 <script>
     // INICIAMOS EL FILTRO AL ENTRAR A LA PÁGINA
-    let status = document.querySelector("#selectStatus").value;
-    let order = document.querySelector("#selectOrder").value;
-    let limit = document.querySelector("#selectLimit").value;
+    let configSearch = {
+        text: $("#inputSearch").val(),
+        status: $("#selectStatus").val(),
+        orderBy: $("#selectOrder").val(),
+        limit: $("#selectLimit").val(),
+        idContainer: "postContainer"
+    };
 
-    filterPost(status, order, limit, "postContainer", '{{ token }}');
+    filterPost(configSearch, '{{ token }}');
 
     // EJECUTAMOS EL FILTRO AL CAMBIAR EL SELECT
-    let selects = document.querySelectorAll("#controllers select");
+    let ctrlSearch = $("#controllers input, select");
 
-    selects.forEach(select => {
-        select.addEventListener("change", function() {
-            let status = document.querySelector("#selectStatus").value;
-            let order = document.querySelector("#selectOrder").value;
-            let limit = document.querySelector("#selectLimit").value;
+    ctrlSearch.each((index, input) => {
+        input.addEventListener("change", function() {
+            configSearch = {
+                text: $("#inputSearch").val(),
+                status: $("#selectStatus").val(),
+                orderBy: $("#selectOrder").val(),
+                limit: $("#selectLimit").val(),
+                idContainer: "postContainer"
+            };
 
-            filterPost(status, order, limit, "postContainer", '{{ token }}');
+            filterPost(configSearch, '{{ token }}');
         });
     })
 </script>

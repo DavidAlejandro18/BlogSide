@@ -14,12 +14,32 @@ const getPosts = (req, res) => {
 }
 
 const getInfoPost = async (req, res) => {
-    const { status, limit, orderBy } = req.query;
+    const { text, status, limit, orderBy } = req.query;
     let query = {};
 
-    if(status != "all") {
-        query.estado = status;
+    if(text) {
+        // buscar con regex titulos o si incluye en el array de tags y que el estado sea igual a status
+        const regex = new RegExp(text, 'i');
+        // @ts-ignore
+        query = {
+            $or: [
+                { titulo: regex },
+                {
+                    tags: { $in: [regex] }
+                },
+            ]
+        };
+        if(status && status != "all") {
+            query.$and = [
+                { estado: status }
+            ]
+        }
+    } else {
+        if(status != "all") {
+            query.estado = status;
+        }
     }
+
 
     if(isNaN(limit)) {
         return res.status(400).json({
