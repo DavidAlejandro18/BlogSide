@@ -283,11 +283,30 @@ const updatePost = async (req, res) => {
     }
 }
 
+const changeStatus = async (req, res) => {
+    try {
+
+        const { id, estado } = req.body;
+
+        await Post.findByIdAndUpdate(id, { estado }, { new: true });
+
+        res.json({
+            msg: 'Estado del post actualizado correctamente'
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            msg: error.message
+        });
+    }
+}
+
 module.exports = {
     getPosts,
     getInfoPost,
     getTags,
     getURLPost,
     createPost,
-    updatePost
+    updatePost,
+    changeStatus
 };

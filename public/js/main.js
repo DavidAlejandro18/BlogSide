@@ -42,10 +42,10 @@ function filterPost(status, orderBy, limit, idContainer, token) {
                             badgeStatus = `<span class="badge bg-warning text-dark">En revisión</span>`;
 
                             options = `
-                                <li class="dropdown-item">
+                                <li class="dropdown-item" data-id-post = "${post.uid}" data-new-status = "2" onclick = "changeStatus(this);">
                                     Aprobar
                                 </li>
-                                <li class="dropdown-item">
+                                <li class="dropdown-item" data-id-post = "${post.uid}" data-new-status = "0" onclick = "changeStatus(this);">
                                     Eliminar
                                 </li>
                             `;
@@ -53,10 +53,10 @@ function filterPost(status, orderBy, limit, idContainer, token) {
                             badgeStatus = `<span class="badge bg-success">Aprobado</span>`;
 
                             options = `
-                                <li class="dropdown-item">
+                                <li class="dropdown-item" data-id-post = "${post.uid}" data-new-status = "1" onclick = "changeStatus(this);">
                                     Revisar
                                 </li>
-                                <li class="dropdown-item">
+                                <li class="dropdown-item" data-id-post = "${post.uid}" data-new-status = "0" onclick = "changeStatus(this);">
                                     Eliminar
                                 </li>
                             `;
@@ -64,10 +64,10 @@ function filterPost(status, orderBy, limit, idContainer, token) {
                             badgeStatus = `<span class="badge bg-danger">Eliminado</span>`;
                             
                             options = `
-                                <li class="dropdown-item">
+                                <li class="dropdown-item" data-id-post = "${post.uid}" data-new-status = "2" onclick = "changeStatus(this);">
                                     Aprobar
                                 </li>
-                                <li class="dropdown-item">
+                                <li class="dropdown-item" data-id-post = "${post.uid}" data-new-status = "1" onclick = "changeStatus(this);">
                                     Revisar
                                 </li>
                             `;
@@ -234,4 +234,42 @@ function setInputTags(idInput) {
             }
         });
     }
+}
+
+function changeStatus(option) {
+
+    if(!option.dataset.idPost || !option.dataset.newStatus || !localStorage.getItem("token")) {
+        throw new Error("No hay suficientes parametros");
+    }
+
+    let idPost = option.dataset.idPost;
+    let newStatus = option.dataset.newStatus;
+
+    let data = new FormData();
+    data.append("id", idPost);
+    data.append("estado", newStatus);
+
+    let config = {
+        method: 'PUT',
+        url: '/blog/change-status',
+        data,
+        headers: {
+            "x-token": localStorage.getItem("token")
+        }
+    };
+
+    axios(config)
+        .then(function (response) {
+            
+            if(response.status == 200) {
+                filterPost($("#selectStatus").val(), $("#selectOrder").val(), $("#selectLimit").val(), "postContainer", localStorage.getItem("token"));
+            }
+
+        })
+        .catch(function (error) {
+            const notificationAudio = new Audio("./audio/notification.wav")
+            notificationAudio.play();
+            $('#notifyFail').toast('show');
+            $('#msgError').text(error.response.data.msg);
+        });
 }

@@ -37,4 +37,11 @@ router.put('/edit-post', [
     validarCampos
 ], ctrlBlog.updatePost);
 
+router.put('/change-status', [
+    validarJWT,
+    check('id', 'El ID es obligatorio').isMongoId(),
+    check('estado', 'El nuevo estado es obligatorio').not().isEmpty(),
+    validarCampos
+], ctrlBlog.changeStatus);
+
 module.exports = router;
