@@ -1,0 +1,55 @@
+{{> topPage }}
+
+<div class="vh-100 d-flex flex-column">
+    {{> navbar }}
+
+    <div class="main">
+        <div class="container p-3">
+
+            {{#if tag}}
+                <h1>{{ firstLetterUppercase tag }}</h1>
+                <hr>
+                
+                {{#if post}}
+                    {{#each post}}
+                        <div class="card mb-3 card-post">
+                            <div class="h-100">
+                                <div class="row g-0 h-100">
+                                    <div class="col-md-3 bg-light rounded-start bg-image-card-post" style = "background-image: url('{{this.baner}}');"></div>
+                                    <div class="col-md-9">
+                                        <div class="card-body">
+                                            <a href="/blog/{{this.url}}" class="card-title text-decoration-none text-dark">
+                                                <h5>{{this.titulo}}</h5>
+                                            </a>
+
+                                            {{#each this.tags}}
+                                                <span class="badge tag rounded-pill custom-bg-tag user-select-none cursor-pointer me-0" onclick = "location.href = '/tags/{{ this }}'">{{ this }}</span>
+                                            {{/each}}
+                                            
+                                            {{!-- <p class="mb-0">Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolorum labore tempore aut? Perspiciatis, dolorum. Eligendi molestias unde molestiae totam..</p> --}}
+                                            <p class="card-text"><small class="text-muted">{{ prettyDate this.createdAt}}</small></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {{/each}}
+                {{else}}
+                    No hay articulos relacionados con '{{ firstLetterUppercase tag }}'
+                {{/if}}
+            {{else}}
+                <h1 class="mb-3">Tags</h1>
+                <div class="d-flex flex-wrap gap-2">
+                    {{#each tags}}
+                        <span class="fs-6 badge tag rounded-pill custom-bg-tag user-select-none cursor-pointer me-0" onclick = "location.href = './tags/{{ this }}'">{{ this }}</span>
+                    {{/each}}
+                </div>
+            {{/if}}
+
+        </div>
+    </div>
+
+    {{> footer }}
+</div>
+
+{{> bottomPage }}

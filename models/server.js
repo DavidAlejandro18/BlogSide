@@ -16,7 +16,8 @@ class Server {
         this.paths = {
             usuarios: '/api/usuarios',
             auth: '/api/auth',
-            blog: "/blog"
+            blog: "/blog",
+            tags: "/tags"
         };
         this.secret_session = process.env.SECRET_SESSION;
 
@@ -106,6 +107,9 @@ class Server {
             },
             json: function(value) {
                 return JSON.stringify(value);
+            },
+            firstLetterUppercase: function(value) {
+                return value.charAt(0).toUpperCase() + value.slice(1);
             }
         });
     }
@@ -114,6 +118,7 @@ class Server {
         this.app.use(this.paths.usuarios, require('../routes/usuarios'));
         this.app.use(this.paths.auth, require('../routes/auth'));
         this.app.use(this.paths.blog, require('../routes/blog'));
+        this.app.use(this.paths.tags, require('../routes/tags'));
         this.app.use(require('../routes/pages'));
     }
 

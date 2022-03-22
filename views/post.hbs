@@ -99,7 +99,7 @@
                             <p class="mb-1">Tags</p>
                             <div class="d-flex flex-wrap gap-1">
                                 {{#each dataPost.tags}}
-                                    <span class="badge tag rounded-pill custom-bg-tag">{{ this }}</span>
+                                    <span class="badge tag rounded-pill custom-bg-tag user-select-none cursor-pointer" onclick = "location.href = '/tags/{{ this }}'">{{ this }}</span>
                                 {{/each}}
                             </div>
                         </div>
