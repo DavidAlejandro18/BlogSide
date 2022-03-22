@@ -80,10 +80,10 @@ function filterPost(data, token) {
 
                         htmlPost += `
                             <div class="card mb-3 card-post position-relative">
-                                <a href="./blog/${post.url}" class="text-decoration-none text-dark" target="blank">
-                                    <div class="row g-0">
-                                        <div class="col-md-4 bg-light rounded-start bg-image-card-post" style = "background-image: url('${post.baner}');"></div>
-                                        <div class="col-md-8">
+                                <a href="./blog/${post.url}" class="text-decoration-none text-dark h-100" target="blank">
+                                    <div class="row g-0 h-100">
+                                        <div class="col-md-3 bg-light rounded-start bg-image-card-post" style = "background-image: url('${post.baner}');"></div>
+                                        <div class="col-md-9">
                                             <div class="card-body">
                                                 <h5 class="card-title">${post.titulo}</h5>
                                                 <p class="card-text">

@@ -71,8 +71,8 @@
 }
 
 .card-post {
-    max-width: 60%;
-    max-height: 170px;
+    /* max-width: 60%; */
+    height: 170px;
 }
 
 .img-card-post {
