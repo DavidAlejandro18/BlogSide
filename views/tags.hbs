@@ -22,11 +22,13 @@
                                                 <h5>{{this.titulo}}</h5>
                                             </a>
 
-                                            {{#each this.tags}}
-                                                <span class="badge tag rounded-pill custom-bg-tag user-select-none cursor-pointer me-0" onclick = "location.href = '/tags/{{ this }}'">{{ this }}</span>
-                                            {{/each}}
+                                            <div class="mb-1">
+                                                {{#each this.tags}}
+                                                    <span class="badge tag rounded-pill custom-bg-tag user-select-none cursor-pointer me-0" onclick = "location.href = '/tags/{{ this }}'">{{ this }}</span>
+                                                {{/each}}
+                                            </div>
                                             
-                                            {{!-- <p class="mb-0">Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolorum labore tempore aut? Perspiciatis, dolorum. Eligendi molestias unde molestiae totam..</p> --}}
+                                            <p class="mb-0">{{this.resumen}}</p>
                                             <p class="card-text"><small class="text-muted">{{ prettyDate this.createdAt}}</small></p>
                                         </div>
                                     </div>

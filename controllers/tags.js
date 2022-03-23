@@ -25,7 +25,7 @@ const getTag = async (req, res) => {
 
     const post = await Post.find({
         $and: [
-            { estado: "1" },
+            { estado: "2" },
             { tags: { $in: [tag] } }
         ]
     }).select("-_id -__v");
