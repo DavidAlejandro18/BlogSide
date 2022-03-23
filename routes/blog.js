@@ -23,6 +23,7 @@ router.post('/create-post', [
     validarJWT,
     validarBaner,
     check('titulo', 'El titulo es obligatorio').not().isEmpty(),
+    check('resumen', 'El resumen es obligatorio y no debe sobrepasar los 150 carácteres').notEmpty().isLength({ max: 150 }),
     check('content', 'El contenido es obligatorio').not().isEmpty(),
     check('tags', 'Las etiquetas son obligatorias').not().isEmpty(),
     validarCampos
@@ -32,6 +33,7 @@ router.put('/edit-post', [
     validarJWT,
     check('id', 'El ID es obligatorio').isMongoId(),
     check('titulo', 'El titulo es obligatorio').not().isEmpty(),
+    check('resumen', 'El resumen es obligatorio y no debe sobrepasar los 150 carácteres').notEmpty().isLength({ max: 150 }),
     check('content', 'El contenido es obligatorio').not().isEmpty(),
     check('tags', 'Las etiquetas son obligatorias').not().isEmpty(),
     validarCampos

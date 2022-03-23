@@ -9,6 +9,14 @@ const PostSchema = new Schema({
             'El titulo es obligatorio'
         ]
     },
+    resumen: {
+        type: String,
+        required: [
+            true,
+            'El resumen es obligatorio'
+        ],
+        maxLength: 150
+    },
     baner: {
         type: String,
         required: [

@@ -20,6 +20,10 @@
                             <input type="text" class="form-control" id="tituloPost" placeholder="Ej: ¿Cómo usar Postman?" value="{{dataPost.titulo}}" required>
                         </div>
                         <div class="mb-3">
+                            <label for="resumenPost" class="form-label">Resumen</label>
+                            <input type="text" class="form-control" id="resumenPost" placeholder="Breve descripción" maxlength="150" value="{{dataPost.resumen}}" required>
+                        </div>
+                        <div class="mb-3">
                             <label for="contenidoPost" class="form-label">Contenido</label>
                             <textarea id = "contenidoPost">
                                 {{contentHTML}}
@@ -83,6 +87,7 @@
             let data = new FormData();
             data.append('id', '{{ dataPost._id }}');
             data.append('titulo', $('#tituloPost').val());
+            data.append('resumen', $('#resumenPost').val());
             data.append('baner', $('#banerPost')[0].files[0]);
             data.append('content', tinymce.activeEditor.getContent());
             data.append('tags', getActualTags().toString());

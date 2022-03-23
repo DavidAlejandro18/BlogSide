@@ -106,7 +106,7 @@ const getURLPost = async (req, res) => {
 const createPost = async (req, res) => {
 
     // OBTENEMOS EL TITULO Y EL CONTENIDO
-    let { titulo, content, tags } = req.body;
+    let { titulo, resumen, content, tags } = req.body;
 
     // GENERAMOS EL URL PERSONALIZADO
     let url = titulo.split(' ').join('-').toLowerCase();
@@ -185,6 +185,7 @@ const createPost = async (req, res) => {
         // CREAMOS UNA NUEVA INSTANCIA DEL POST
         const newPost = new Post({
             titulo,
+            resumen,
             url,
             content: `${url}.html`,
             baner: secure_url,
@@ -206,7 +207,7 @@ const createPost = async (req, res) => {
 
 const updatePost = async (req, res) => {
     try {
-        let { id, titulo, content, tags }  = req.body;
+        let { id, titulo, resumen, content, tags }  = req.body;
         let newDataPost = {}
 
         // OBTENEMOS EL POST
@@ -287,6 +288,7 @@ const updatePost = async (req, res) => {
         }));
 
         newDataPost.titulo = titulo;
+        newDataPost.resumen = resumen;
 
         // ACTUALIZAMOS EL POST
         await Post.findByIdAndUpdate(id, newDataPost, { new: true });
