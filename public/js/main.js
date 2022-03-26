@@ -82,15 +82,15 @@ function filterPost(data, token) {
                             <div class="card mb-3 card-post position-relative">
                                 <a href="./blog/${post.url}" class="text-decoration-none text-dark h-100" target="blank">
                                     <div class="row g-0 h-100">
-                                        <div class="col-md-3 bg-light rounded-start bg-image-card-post" style = "background-image: url('${post.baner}');"></div>
+                                        <div class="col-md-3 bg-light rounded-start bg-image-card-post d-none d-md-block" style = "background-image: url('${post.baner}');"></div>
                                         <div class="col-md-9">
-                                            <div class="card-body">
+                                            <div class="card-body d-flex flex-column h-100">
                                                 <h5 class="card-title">${post.titulo}</h5>
-                                                <p class="card-text">
+                                                <p class="m-0">
                                                     ${badgeStatus}
                                                 </p>
-                                                <p>Escrito por: ${post.creadoPor.username}</p>
-                                                <p class="card-text"><small class="text-muted">${prettyDate(post.createdAt)}</small></p>
+                                                <p class = "mb-2 text-truncate">${post.resumen}</p>
+                                                <p class="card-text mt-auto"><small class="text-muted">${prettyDate(post.createdAt)}</small></p>
                                             </div>
                                         </div>
                                     </div>
