@@ -1,0 +1,43 @@
+{{> topPage }}
+
+<div class="vh-100 d-flex flex-column">
+
+    {{> navbar }}
+
+    <div class="main">
+        <div class="container p-3">
+            <h1 class="mb-3">Todos los artículos</h1>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <input type="search" class="form-control" id="input-search" placeholder="Buscar un artículo">
+                        <span class="input-group-text" id="basic-addon2">
+                            <i class="bi bi-search"></i>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <hr>
+
+            <div id="list-post">
+                <div class="text-center mt-3">
+                    <div class="spinner-border" style="width: 3rem; height: 3rem;" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{> footer }}
+</div>
+
+<script>
+    searchPost({
+        container: "list-post",
+        idInput: "input-search"
+    });
+</script>
+
+{{> bottomPage }}

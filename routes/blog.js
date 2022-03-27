@@ -17,6 +17,8 @@ router.get('/getTags', [
     validarCampos
 ], ctrlBlog.getTags);
 
+router.get('/result?:search', ctrlBlog.getResult);
+
 router.get('/:url?', ctrlBlog.getURLPost);
 
 router.post('/create-post', [

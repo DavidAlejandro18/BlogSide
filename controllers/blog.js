@@ -10,7 +10,11 @@ const Tag = require('../models/tags');
 const archivosPermitidos = ['png', 'jpg', 'jpeg', 'gif'];
 
 const getPosts = (req, res) => {
-    res.send("Vamos a ver todos los post");
+    res.render('blog', {
+        title: 'BlogSide | Blog',
+        usuario: req.session.usuario,
+        token: req.session.token
+    })
 }
 
 const getInfoPost = async (req, res) => {
@@ -71,6 +75,35 @@ const getTags = async (req, res) => {
     res.json({
         termino,
         tags
+    });
+}
+
+const getResult = async (req, res) => {
+    const { search } = req.query;
+    let query = {};
+
+    if(search.length > 0) {
+        let regex = new RegExp(search, 'i');
+        // @ts-ignore
+        query = {
+            $or: [
+                { titulo: regex },
+                {
+                    tags: { $in: [regex] }
+                },
+            ],
+            $and: [
+                { estado: "2" }
+            ]
+        };
+    } else {
+        query.estado = "2";
+    }
+
+    const posts = await Post.find(query).select("-_id -estado").sort({ createdAt: "desc" }).populate('creadoPor', 'username -_id');
+
+    res.json({
+        posts
     });
 }
 
@@ -327,6 +360,7 @@ module.exports = {
     getPosts,
     getInfoPost,
     getTags,
+    getResult,
     getURLPost,
     createPost,
     updatePost,

@@ -286,3 +286,61 @@ function changeStatus(option) {
             $('#msgError').text(error.response.data.msg);
         });
 }
+
+function searchPost(data) {
+    if(!data.container || !data.idInput) {
+        throw new Error("No hay suficientes parametros");
+    }
+
+    let container = document.getElementById(data.container);
+    let input = document.getElementById(data.idInput);
+
+    if(!container || !input) {
+        throw new Error("No se encontro el contenedor o el input");
+    }
+
+    input.addEventListener("change", function() {
+        let value = input.value;
+
+        axios.get(`/blog/result?search=${value}`)
+            .then(function(response) {
+
+                if(response.status == 200) {
+                    let posts = response.data.posts;
+                    let cardsPost = "";
+
+                    if(posts.length > 0) {
+                        posts.forEach((post) => {
+                            let tags = post.tags.map(tag => {
+                                return `
+                                    <span class="badge tag rounded-pill custom-bg-tag user-select-none cursor-pointer" onclick = "location.href = '/tags/${tag}'">${tag}</span>
+                                `;
+                            }).join("");
+    
+                            cardsPost += `
+                                <div class="card mb-3 user-select-none">
+                                    <div class="card-body">
+                                        <a href = "/blog/${post.url}" class = "text-decoration-none text-dark"><h4>${post.titulo}</h4></a>
+                                        <p>${tags}</p>
+                                        <p>${post.resumen}</p>
+                                        <small class = "text-muted">${prettyDate(post.createdAt)}</small>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                    } else {
+                        cardsPost = `
+                            <h4 class = "text-center">No hay artículos relacionados con '${value}'</h4>
+                        `;
+                    }
+                    
+                    container.innerHTML = cardsPost;
+                }
+            })
+            .catch(function(error) {
+                console.log(error);
+            });
+    });
+
+    input.dispatchEvent(new Event('change'));
+}
