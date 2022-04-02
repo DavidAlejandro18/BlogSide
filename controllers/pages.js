@@ -4,11 +4,14 @@ const { isValidObjectId } = require("mongoose");
 const path = require('path');
 const fs = require('fs');
 
-const ctrlIndex = (req, res) => {
+const ctrlIndex = async (req, res) => {
+    const posts = await Post.find({ estado: "2" }).limit(10).select("-_id -estado").sort({ createdAt: "desc" }).populate('creadoPor', 'username -_id');
+
     res.render("index", {
         title: "BlogSide",
         usuario: req.session.usuario,
-        token: req.session.token
+        token: req.session.token,
+        posts
     });
 }
 
