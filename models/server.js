@@ -110,6 +110,9 @@ class Server {
             },
             firstLetterUppercase: function(value) {
                 return value.charAt(0).toUpperCase() + value.slice(1);
+            },
+            toString: function(array) {
+                return array.toString();
             }
         });
     }

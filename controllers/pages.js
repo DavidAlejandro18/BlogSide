@@ -7,17 +7,33 @@ const fs = require('fs');
 const ctrlIndex = async (req, res) => {
     const posts = await Post.find({ estado: "2" }).limit(10).select("-_id -estado").sort({ createdAt: "desc" }).populate('creadoPor', 'username -_id');
 
+    const dataSEO = {
+        resumen: "BlogSide es un pequeño blog creado con el objetivo de compartir conocimientos, retos y experiencias de programación.",
+        tags: ["blog", "code", "consejos", "programación"],
+        pagina: "",
+        img: "https://blogside.herokuapp.com/img/BlogSide%20Dark.png"
+    };
+
     res.render("index", {
         title: "BlogSide",
         usuario: req.session.usuario,
         token: req.session.token,
+        dataSEO,
         posts
     });
 }
 
 const ctrlAbout = (req, res) => {
+    const dataSEO = {
+        resumen: "BlogSide es un pequeño blog creado con el objetivo de compartir conocimientos, retos y experiencias de programación.",
+        tags: ["blog", "David Tovar", "me", "about me"],
+        pagina: "about",
+        img: "https://blogside.herokuapp.com/img/me.jpeg"
+    };
+
     res.render('about', {
         title: 'BlogSide | Acerca de mí',
+        dataSEO
     });
 }
 
