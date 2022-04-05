@@ -126,6 +126,12 @@ class Server {
     }
 
     listen() {
+        this.app.use((req, res, next) => {
+            res.status(404).render('404', {
+                title: 'BlogSide | Página no encontrada'
+            });
+        });
+
         this.app.listen(this.port, () => {
             console.log(`Server running on port ${this.port}`);
         });
