@@ -126,6 +126,10 @@ class Server {
     }
 
     listen() {
+        this.app.use((err, req, res, next) => {
+            res.status(500).send('Internal Server Error');
+        });
+        
         this.app.use((req, res, next) => {
             res.status(404).render('404', {
                 title: 'BlogSide | Página no encontrada'
