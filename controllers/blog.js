@@ -1,7 +1,5 @@
 //@ts-check
-const { v4: uuidv4 } = require('uuid');
-const path = require('path');
-const fs = require('fs');
+const axios = require('axios').default;
 const cloudinary = require('cloudinary').v2;
 cloudinary.config(process.env.CLOUDINARY_URL);
 
@@ -111,29 +109,36 @@ const getURLPost = async (req, res) => {
     const { url } = req.params;
     const post = await Post.find({ url }).populate('creadoPor', 'nombre img correo -_id').select('-_id').lean();
 
-    if(!post[0]) {
+    try {
+        if(!post[0]) {
+            return res.status(404).render('404', {
+                title: 'BlogSide | Página no encontrada'
+            });
+        }
+    
+        const { content: urlContent, ...dataPost } = post[0];
+        let contentHTML = '';
+    
+        const fileContent = await axios.get(`${process.env.URL_CLOUD}contents/${urlContent}`);
+        if(fileContent.status != 200 || (dataPost.estado != "2" && !req.session.token)) {
+            return res.status(404).render('404', {
+                title: 'BlogSide | Página no encontrada'
+            });
+        } else {
+            contentHTML = fileContent.data;
+            contentHTML = contentHTML.replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+        }
+    
+        res.render('post', {
+            title: `BlogSide | ${dataPost.titulo}`,
+            contentHTML,
+            dataPost
+        });
+    } catch (error) {
         return res.status(404).render('404', {
             title: 'BlogSide | Página no encontrada'
         });
     }
-
-    const { content: urlContent, ...dataPost } = post[0];
-    let contentHTML = '';
-
-    if(!fs.existsSync(path.join(__dirname, `../contents/${urlContent}`)) || (dataPost.estado != "2" && !req.session.token)) {
-        return res.status(404).render('404', {
-            title: 'BlogSide | Página no encontrada'
-        });
-    } else {
-        contentHTML = fs.readFileSync(path.join(__dirname, `../contents/${urlContent}`), 'utf8');
-        contentHTML = contentHTML.replace(/&lt;/g, '<').replace(/&gt;/g, '>');
-    }
-
-    res.render('post', {
-        title: `BlogSide | ${dataPost.titulo}`,
-        contentHTML,
-        dataPost
-    });
 }
 
 const createPost = async (req, res) => {
@@ -182,15 +187,23 @@ const createPost = async (req, res) => {
         
                 if (base64.substr(0, 4) != 'http') {
                     const { secure_url: secure_url_image_post } = await cloudinary.uploader.upload(base64, { folder: 'posts' });
-        
                     content = content.replace(`src="${base64}"`, `src="${secure_url_image_post}"`);
                 }
             }));
         }
         
         // GUARDAMOS EL CONTENIDO DEL POST EN EL SERVIDOR
-        const pathContent = path.join(__dirname, `../contents/${url}.html`);
-        fs.writeFileSync(pathContent, content);
+        const dataCloud = new URLSearchParams();
+        dataCloud.append('nameFile', `${url}.html`);
+        dataCloud.append('content', content);
+        await axios.post(`${process.env.URL_CLOUD}api/save-content.php`,
+            dataCloud,
+            {
+                headers: {
+                    'x-token': process.env.CLOUD_TOKEN
+                }
+            }
+        );
         
         // GENERAMOS EL ARRAY DE LOS TAGS
         tags = tags.split(',').map(tag => {
@@ -293,8 +306,17 @@ const updatePost = async (req, res) => {
         }
 
         // REESCRIBIMOS EL CONTENIDO DEL ARCHIVO HTML
-        let pathContent = path.join(__dirname, `../contents/${post.content}`);
-        fs.writeFileSync(pathContent, content);
+        const dataCloud = new URLSearchParams();
+        dataCloud.append('nameFile', post.content);
+        dataCloud.append('content', content);
+        await axios.post(`${process.env.URL_CLOUD}api/save-content.php`,
+            dataCloud,
+            {
+                headers: {
+                    'x-token': process.env.CLOUD_TOKEN
+                }
+            }
+        );
         
         // GENERAMOS EL ARRAY DE LOS NUEVOS TAGS
         tags = tags.split(',').map(tag => {

@@ -1,8 +1,7 @@
 //@ts-check
 const Post = require('../models/post');
 const { isValidObjectId } = require("mongoose");
-const path = require('path');
-const fs = require('fs');
+const axios = require('axios').default;
 
 const ctrlIndex = async (req, res) => {
     const posts = await Post.find({ estado: "2" }).limit(10).select("-_id -estado").sort({ createdAt: "desc" }).populate('creadoPor', 'username -_id');
@@ -77,12 +76,13 @@ const ctrlEditPost = async (req, res) => {
     const { content: urlContent, ...dataPost } = post;
     let contentHTML = '';
 
-    if(!fs.existsSync(path.join(__dirname, `../contents/${urlContent}`)) || (dataPost.estado != "2" && !req.session.token)) {
+    const fileContent = await axios.get(`${process.env.URL_CLOUD}contents/${urlContent}`);
+    if(fileContent.status != 200 || (dataPost.estado != "2" && !req.session.token)) {
         return res.status(404).render('404', {
             title: 'BlogSide | Página no encontrada'
         });
     } else {
-        contentHTML = fs.readFileSync(path.join(__dirname, `../contents/${urlContent}`), 'utf8');
+        contentHTML = fileContent.data;
     }
 
     res.render('editPost', {
